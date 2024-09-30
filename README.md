@@ -7,6 +7,7 @@
 - 国内TXT [每三日更新](http://175.178.251.183:6689/live.txt)
 - 仓库文件加速 [线路1](https://gh.con.sh/https://raw.githubusercontent.com/CCSH/IPTV/main/live.m3u)
 - 仓库文件加速 [线路2](https://cdn.jsdelivr.net/gh/CCSH/IPTV@latest/live.m3u)
+- 仓库文件加速 [线路3](https://mirror.ghproxy.com/https://raw.githubusercontent.com/CCSH/IPTV/main/live.m3u)
 
 ## IPV6优势
 1. 更低的延迟: IPv6协议在一些方面能提供更低的延迟，这对于实时视频流的播放体验很重要，可以减少视频缓冲和加载时间。
