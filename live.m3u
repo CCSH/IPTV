@@ -28067,6 +28067,214 @@ http://43.138.170.29:35455/yy/22089862$IPV4
 http://43.138.170.29:35455/yy/1354931585$IPV4
 #EXTINF:-1 tvg-id="1" tvg-name="三部僵约轮播" tvg-logo="https://epg.112114.free.hr/logo/三部僵约轮播.png" group-title="电视剧",三部僵约轮播
 http://43.138.170.29:35455/douyu/9470198$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://120.77.28.4:8648/huya.php?id=11342412$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://43.138.170.29:35455/yy/1354658049$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://43.138.170.29:35455/yy/1382736808$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://diyp.zxxoo.work/douyu/122402$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://204bae1.123nat.com:35455/yy/38670875$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://204bae1.123nat.com:35455/yy/1354889048$IPV4『线路6』
+#EXTINF:-1 tvg-id="7" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://204bae1.123nat.com:35455/yy/29945997$IPV4『线路7』
+#EXTINF:-1 tvg-id="8" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://204bae1.123nat.com:35455/yy/1354658049$IPV4『线路8』
+#EXTINF:-1 tvg-id="9" tvg-name="周星驰" tvg-logo="https://epg.112114.free.hr/logo/周星驰.png" group-title="电影频道",周星驰
+http://huanqiuzhibo.cn/manifest/douyu.php?id=122402$IPV4『线路9』
+#EXTINF:-1 tvg-id="1" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://120.77.28.4:8648/huya.php?id=11342421$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+https://aldirect.flv.huya.com/src/1394575543-1394575543-5989656348986441728-2789274542-10057-A-0-1.flv$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://diyp.zxxoo.work/huya/11342421$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://204bae1.123nat.com:35455/yy/1353685311$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://204bae1.123nat.com:35455/yy/1351505899$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+https://stream1.freetv.fun/lin-zheng-ying-7.ctv$IPV4『线路6』
+#EXTINF:-1 tvg-id="7" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://204bae1.123nat.com:35455/yy/1382841203$IPV4『线路7』
+#EXTINF:-1 tvg-id="8" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+https://stream1.freetv.fun/lin-zheng-ying-4.ctv$IPV4『线路8』
+#EXTINF:-1 tvg-id="9" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://204bae1.123nat.com:35455/yy/30668277$IPV4『线路9』
+#EXTINF:-1 tvg-id="10" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+https://stream1.freetv.fun/lin-zheng-ying-6.ctv$IPV4『线路10』
+#EXTINF:-1 tvg-id="11" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+https://stream1.freetv.fun/lin-zheng-ying-5.ctv$IPV4『线路11』
+#EXTINF:-1 tvg-id="12" tvg-name="林正英" tvg-logo="https://epg.112114.free.hr/logo/林正英.png" group-title="电影频道",林正英
+http://204bae1.123nat.com:35455/yy/1453996620$IPV4『线路12』
+#EXTINF:-1 tvg-id="1" tvg-name="周润发" tvg-logo="https://epg.112114.free.hr/logo/周润发.png" group-title="电影频道",周润发
+http://120.77.28.4:8648/huya.php?id=11342387$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="周润发" tvg-logo="https://epg.112114.free.hr/logo/周润发.png" group-title="电影频道",周润发
+http://43.138.170.29:35455/yy/1354888733$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="周润发" tvg-logo="https://epg.112114.free.hr/logo/周润发.png" group-title="电影频道",周润发
+http://43.138.170.29:35455/yy/1354889044$IPV4『线路3』
+#EXTINF:-1 tvg-id="1" tvg-name="成龙" tvg-logo="https://epg.112114.free.hr/logo/成龙.png" group-title="电影频道",成龙
+http://120.77.28.4:8648/huya.php?id=11342386$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="成龙" tvg-logo="https://epg.112114.free.hr/logo/成龙.png" group-title="电影频道",成龙
+http://204bae1.123nat.com:35455/yy/34460526$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="成龙" tvg-logo="https://epg.112114.free.hr/logo/成龙.png" group-title="电影频道",成龙
+http://zby.xjqxz.top/cldy/live.m3u8$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="成龙" tvg-logo="https://epg.112114.free.hr/logo/成龙.png" group-title="电影频道",成龙
+http://cfss.cc/cdn/hy/11342386.m3u8$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="成龙" tvg-logo="https://epg.112114.free.hr/logo/成龙.png" group-title="电影频道",成龙
+https://p6-dy.byteimg.com/origin/pgc-image/bebfddceee5c40f495882785675174cf$IPV4『线路5』
+#EXTINF:-1 tvg-id="1" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://120.77.28.4:8648/huya.php?id=11342390$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://43.138.170.29:35455/yy/74613175$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://204bae1.123nat.com:35455/yy/74613175$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://204bae1.123nat.com:35455/yy/1348991095$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://cfss.cc/cdn/hy/11342390.m3u8$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="李连杰" tvg-logo="https://epg.112114.free.hr/logo/李连杰.png" group-title="电影频道",李连杰
+http://11.xmyxc.cn/api/php/yy.php?id=74613175$IPV4『线路6』
+#EXTINF:-1 tvg-id="1" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+http://120.77.28.4:8648/huya.php?id=11279251$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+http://43.138.170.29:35455/yy/1354924839$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+http://204bae1.123nat.com:35455/yy/1382851602$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+http://204bae1.123nat.com:35455/yy/1354924839$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+https://stream1.freetv.fun/hong-jin-bao-2.ctv$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+https://stream1.freetv.fun/hong-jin-bao-5.ctv$IPV4『线路6』
+#EXTINF:-1 tvg-id="7" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+https://stream1.freetv.fun/hong-jin-bao-3.ctv$IPV4『线路7』
+#EXTINF:-1 tvg-id="8" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+http://11.xmyxc.cn/api/php/yy.php?id=1354924839$IPV4『线路8』
+#EXTINF:-1 tvg-id="9" tvg-name="洪金宝" tvg-logo="https://epg.112114.free.hr/logo/洪金宝.png" group-title="电影频道",洪金宝
+https://stream1.freetv.fun/hong-jin-bao-1.ctv$IPV4『线路9』
+#EXTINF:-1 tvg-id="1" tvg-name="赵丽颖" tvg-logo="https://epg.112114.free.hr/logo/赵丽颖.png" group-title="电影频道",赵丽颖
+http://120.77.28.4:8648/huya.php?id=29982668$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="梁家辉" tvg-logo="https://epg.112114.free.hr/logo/梁家辉.png" group-title="电影频道",梁家辉
+http://120.77.28.4:8648/huya.php?id=11342429$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="梁家辉" tvg-logo="https://epg.112114.free.hr/logo/梁家辉.png" group-title="电影频道",梁家辉
+http://diyp.zxxoo.work/huya/11342429$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="梁家辉" tvg-logo="https://epg.112114.free.hr/logo/梁家辉.png" group-title="电影频道",梁家辉
+http://cfss.cc/cdn/hy/11342429.m3u8$IPV4『线路3』
+#EXTINF:-1 tvg-id="1" tvg-name="许冠英" tvg-logo="https://epg.112114.free.hr/logo/许冠英.png" group-title="电影频道",许冠英
+http://120.77.28.4:8648/huya.php?id=11601972$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="许冠英" tvg-logo="https://epg.112114.free.hr/logo/许冠英.png" group-title="电影频道",许冠英
+http://diyp.zxxoo.work/huya/11601972$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+http://120.77.28.4:8648/huya.php?id=11342424$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+http://43.138.170.29:35455/yy/1382745111$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+http://204bae1.123nat.com:35455/yy/1354888726$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+http://204bae1.123nat.com:35455/yy/1382745111$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+https://stream1.freetv.fun/liu-de-hua-7.ctv$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+https://stream1.freetv.fun/liu-de-hua-4.ctv$IPV4『线路6』
+#EXTINF:-1 tvg-id="7" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+https://stream1.freetv.fun/liu-de-hua-6.ctv$IPV4『线路7』
+#EXTINF:-1 tvg-id="8" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+https://stream1.freetv.fun/liu-de-hua-2.ctv$IPV4『线路8』
+#EXTINF:-1 tvg-id="9" tvg-name="刘德华" tvg-logo="https://epg.112114.free.hr/logo/刘德华.png" group-title="电影频道",刘德华
+https://stream1.freetv.fun/liu-de-hua-1.ctv$IPV4『线路9』
+#EXTINF:-1 tvg-id="1" tvg-name="斯坦森" tvg-logo="https://epg.112114.free.hr/logo/斯坦森.png" group-title="电影频道",斯坦森
+http://120.77.28.4:8648/huya.php?id=21059588$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="小鬼头" tvg-logo="https://epg.112114.free.hr/logo/小鬼头.png" group-title="电影频道",小鬼头
+http://120.77.28.4:8648/huya.php?id=880261$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="王晶" tvg-logo="https://epg.112114.free.hr/logo/王晶.png" group-title="电影频道",王晶
+http://120.77.28.4:8648/huya.php?id=11602058$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="王晶" tvg-logo="https://epg.112114.free.hr/logo/王晶.png" group-title="电影频道",王晶
+http://cfss.cc/cdn/hy/11602058.m3u8$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="王晶" tvg-logo="https://epg.112114.free.hr/logo/王晶.png" group-title="电影频道",王晶
+http://diyp.zxxoo.work/huya/11602058$IPV4『线路3』
+#EXTINF:-1 tvg-id="1" tvg-name="沈腾" tvg-logo="https://epg.112114.free.hr/logo/沈腾.png" group-title="电影频道",沈腾
+http://120.77.28.4:8648/huya.php?id=11601968$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="沈腾" tvg-logo="https://epg.112114.free.hr/logo/沈腾.png" group-title="电影频道",沈腾
+http://cfss.cc/cdn/hy/11601968.m3u8$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="黄渤" tvg-logo="https://epg.112114.free.hr/logo/黄渤.png" group-title="电影频道",黄渤
+http://120.77.28.4:8648/huya.php?id=11352876$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="黄渤" tvg-logo="https://epg.112114.free.hr/logo/黄渤.png" group-title="电影频道",黄渤
+http://cfss.cc/cdn/hy/11352876.m3u8$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="强森" tvg-logo="https://epg.112114.free.hr/logo/强森.png" group-title="电影频道",强森
+http://120.77.28.4:8648/huya.php?id=21059581$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="漫威" tvg-logo="https://epg.112114.free.hr/logo/漫威.png" group-title="电影频道",漫威
+http://120.77.28.4:8648/huya.php?id=11602034$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="宇宙" tvg-logo="https://epg.112114.free.hr/logo/宇宙.png" group-title="电影频道",宇宙
+http://120.77.28.4:8648/huya.php?id=11342428$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="怪兽" tvg-logo="https://epg.112114.free.hr/logo/怪兽.png" group-title="电影频道",怪兽
+http://120.77.28.4:8648/huya.php?id=21059577$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="武侠" tvg-logo="https://epg.112114.free.hr/logo/武侠.png" group-title="电影频道",武侠
+http://120.77.28.4:8648/huya.php?id=11342427$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="警匪" tvg-logo="https://epg.112114.free.hr/logo/警匪.png" group-title="电影频道",警匪
+http://120.77.28.4:8648/huya.php?id=11352886$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="古惑仔" tvg-logo="https://epg.112114.free.hr/logo/古惑仔.png" group-title="电影频道",古惑仔
+http://120.77.28.4:8648/huya.php?id=11336719$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="古惑仔" tvg-logo="https://epg.112114.free.hr/logo/古惑仔.png" group-title="电影频道",古惑仔
+https://lunbo.freetv.top/yy/1458015189$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="古天乐" tvg-logo="https://epg.112114.free.hr/logo/古天乐.png" group-title="电影频道",古天乐
+http://120.77.28.4:8648/huya.php?id=29982675$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="枪战" tvg-logo="https://epg.112114.free.hr/logo/枪战.png" group-title="电影频道",枪战
+http://120.77.28.4:8648/huya.php?id=11352962$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="国产僵尸" tvg-logo="https://epg.112114.free.hr/logo/国产僵尸.png" group-title="电影频道",国产僵尸
+http://120.77.28.4:8648/huya.php?id=11279247$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="电影推荐" tvg-logo="https://epg.112114.free.hr/logo/电影推荐.png" group-title="电影频道",电影推荐
+http://120.77.28.4:8648/huya.php?id=11602041$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="电影推荐" tvg-logo="https://epg.112114.free.hr/logo/电影推荐.png" group-title="电影频道",电影推荐
+http://cfss.cc/cdn/hy/11602041.flv$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="短剧推荐" tvg-logo="https://epg.112114.free.hr/logo/短剧推荐.png" group-title="电影频道",短剧推荐
+http://120.77.28.4:8648/huya.php?id=21059594$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="热血电影" tvg-logo="https://epg.112114.free.hr/logo/热血电影.png" group-title="电影频道",热血电影
+http://120.77.28.4:8648/huya.php?id=11352934$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="盗墓电影" tvg-logo="https://epg.112114.free.hr/logo/盗墓电影.png" group-title="电影频道",盗墓电影
+http://120.77.28.4:8648/huya.php?id=21059552$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="贺岁电影" tvg-logo="https://epg.112114.free.hr/logo/贺岁电影.png" group-title="电影频道",贺岁电影
+http://120.77.28.4:8648/huya.php?id=11601971$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="玄幻电影" tvg-logo="https://epg.112114.free.hr/logo/玄幻电影.png" group-title="电影频道",玄幻电影
+http://120.77.28.4:8648/huya.php?id=11342414$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="谍战电影" tvg-logo="https://epg.112114.free.hr/logo/谍战电影.png" group-title="电影频道",谍战电影
+http://120.77.28.4:8648/huya.php?id=21059585$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="喜剧电影" tvg-logo="https://epg.112114.free.hr/logo/喜剧电影.png" group-title="电影频道",喜剧电影
+http://120.77.28.4:8648/huya.php?id=11352877$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="喜剧电影" tvg-logo="https://epg.112114.free.hr/logo/喜剧电影.png" group-title="电影频道",喜剧电影
+http://120.77.28.4:8648/douyu.php?id=9292492$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="喜剧电影" tvg-logo="https://epg.112114.free.hr/logo/喜剧电影.png" group-title="电影频道",喜剧电影
+http://159.75.85.63:35455/douyu/9292492$IPV4『线路3』
+#EXTINF:-1 tvg-id="1" tvg-name="搞笑恐怖" tvg-logo="https://epg.112114.free.hr/logo/搞笑恐怖.png" group-title="电影频道",搞笑恐怖
+http://120.77.28.4:8648/huya.php?id=11601960$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="经典港片" tvg-logo="https://epg.112114.free.hr/logo/经典港片.png" group-title="电影频道",经典港片
+http://120.77.28.4:8648/huya.php?id=11602043$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="国产电影" tvg-logo="https://epg.112114.free.hr/logo/国产电影.png" group-title="电影频道",国产电影
+http://120.77.28.4:8648/huya.php?id=11352973$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="周星驰粤语" tvg-logo="https://epg.112114.free.hr/logo/周星驰粤语.png" group-title="电影频道",周星驰粤语
+http://120.77.28.4:8648/huya.php?id=11336587$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="许氏三杰" tvg-logo="https://epg.112114.free.hr/logo/许氏三杰.png" group-title="电影频道",许氏三杰
+http://120.77.28.4:8648/huya.php?id=11602033$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="五福星" tvg-logo="https://epg.112114.free.hr/logo/五福星.png" group-title="电影频道",五福星
+http://120.77.28.4:8648/huya.php?id=11282233$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="邱淑贞" tvg-logo="https://epg.112114.free.hr/logo/邱淑贞.png" group-title="电影频道",邱淑贞
+http://120.77.28.4:8648/huya.php?id=11352949$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="邱淑贞" tvg-logo="https://epg.112114.free.hr/logo/邱淑贞.png" group-title="电影频道",邱淑贞
+http://120.77.28.4:8648/huya.php?id=11336571$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="徐克" tvg-logo="https://epg.112114.free.hr/logo/徐克.png" group-title="电影频道",徐克
+http://120.77.28.4:8648/huya.php?id=11352909$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="开心鬼系列" tvg-logo="https://epg.112114.free.hr/logo/开心鬼系列.png" group-title="电影频道",开心鬼系列
+http://120.77.28.4:8648/huya.php?id=11342423$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="漫威合集" tvg-logo="https://epg.112114.free.hr/logo/漫威合集.png" group-title="电影频道",漫威合集
+http://120.77.28.4:8648/huya.php?id=26355802$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="古墓系列" tvg-logo="https://epg.112114.free.hr/logo/古墓系列.png" group-title="电影频道",古墓系列
+http://120.77.28.4:8648/huya.php?id=11352913$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="高分动作" tvg-logo="https://epg.112114.free.hr/logo/高分动作.png" group-title="电影频道",高分动作
+http://120.77.28.4:8648/huya.php?id=11352884$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="赌神系列" tvg-logo="https://epg.112114.free.hr/logo/赌神系列.png" group-title="电影频道",赌神系列
+http://120.77.28.4:8648/huya.php?id=11342399$IPV4
 #EXTINF:-1 tvg-id="1" tvg-name="黑莓动画" tvg-logo="https://epg.112114.free.hr/logo/黑莓动画.png" group-title="少儿频道",黑莓动画
 http://[2409:8087:1a0b:df::4006]:80/ottrrs.hl.chinamobile.com/TVOD/88888888/224/3221225662/index.m3u8$IPV6『线路1』
 #EXTINF:-1 tvg-id="2" tvg-name="黑莓动画" tvg-logo="https://epg.112114.free.hr/logo/黑莓动画.png" group-title="少儿频道",黑莓动画
