@@ -1,8 +1,4 @@
-#EXTM3U x-tvg-url="https://live.fanmingming.com/e.xml","http://epg.51zmt.top:8000/difang.xml","https://epg.v1.mk/fy.xml","http://epg.51zmt.top:8000/e.xml","https://epg.112114.xyz/pp.xml"
-#EXTINF:-1 tvg-id="1" tvg-name="请阅读" tvg-logo="http://175.178.251.183:6689/LR.jpg" group-title="公告",请阅读
-https://liuliuliu.tv/api/channels/1997/stream
-#EXTINF:-1 tvg-id="1" tvg-name="yuanzl77.github.io" tvg-logo="http://175.178.251.183:6689/LR.jpg" group-title="公告",yuanzl77.github.io
-https://liuliuliu.tv/api/channels/233/stream
+#EXTM3U x-tvg-url="https://live.fanmingming.com/e.xml","http://epg.51zmt.top:8000/difang.xml","https://epg.v1.mk/fy.xml","http://epg.51zmt.top:8000/e.xml","https://gh.con.sh/https://raw.githubusercontent.com/sparkssssssssss/epg/main/pp.xml","https://epg.112114.xyz/pp.xml"
 #EXTINF:-1 tvg-id="1" tvg-name="更新日期" tvg-logo="http://175.178.251.183:6689/LR.jpg" group-title="公告",更新日期
 https://gitlab.com/lr77/IPTV/-/raw/main/%E4%B8%BB%E8%A7%92.mp4
 #EXTINF:-1 tvg-id="1" tvg-name="2024-10-24" tvg-logo="http://175.178.251.183:6689/LR.jpg" group-title="公告",2024-10-24
@@ -28113,6 +28109,134 @@ https://cdn.iptv8k.top/dl/jrys.php?id=230&time=20240926215313&ip=111.229.253.40$
 https://cdn.iptv8k.top/dl/jrys.php?id=231&time=20240926215313&ip=111.229.253.40$IPV4『线路9』
 #EXTINF:-1 tvg-id="10" tvg-name="东森电影" tvg-logo="https://epg.112114.free.hr/logo/东森电影.png" group-title="港·澳·台",东森电影
 http://cookies.elementfx.com/chaojidianshi/chaojidianshi.php?id=ettvmovie$IPV4『线路10』
+#EXTINF:-1 tvg-id="1" tvg-name="83射雕英雄传" tvg-logo="https://epg.112114.free.hr/logo/83射雕英雄传.png" group-title="电视剧",83射雕英雄传
+http://159.75.85.63:35455/yy/1354210357$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="83射雕英雄传" tvg-logo="https://epg.112114.free.hr/logo/83射雕英雄传.png" group-title="电视剧",83射雕英雄传
+http://mitv.ts138.top/yy/1354210357$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="83射雕英雄传" tvg-logo="https://epg.112114.free.hr/logo/83射雕英雄传.png" group-title="电视剧",83射雕英雄传
+http://43.138.170.29:35455/yy/1354210357$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="83射雕英雄传" tvg-logo="https://epg.112114.free.hr/logo/83射雕英雄传.png" group-title="电视剧",83射雕英雄传
+https://lunbo.freetv.top/yy/1354210357$IPV4『线路4』
+#EXTINF:-1 tvg-id="1" tvg-name="95神雕侠侣粤" tvg-logo="https://epg.112114.free.hr/logo/95神雕侠侣粤.png" group-title="电视剧",95神雕侠侣粤
+http://159.75.85.63:35455/yy/1354926637$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="95神雕侠侣粤" tvg-logo="https://epg.112114.free.hr/logo/95神雕侠侣粤.png" group-title="电视剧",95神雕侠侣粤
+http://43.138.170.29:35455/yy/1354926637$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="96笑傲江湖版" tvg-logo="https://epg.112114.free.hr/logo/96笑傲江湖版.png" group-title="电视剧",96笑傲江湖版
+http://159.75.85.63:35455/yy/1354930909$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="96笑傲江湖版" tvg-logo="https://epg.112114.free.hr/logo/96笑傲江湖版.png" group-title="电视剧",96笑傲江湖版
+http://43.138.170.29:35455/yy/1354930909$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="87经典红楼梦" tvg-logo="https://epg.112114.free.hr/logo/87经典红楼梦.png" group-title="电视剧",87经典红楼梦
+http://159.75.85.63:35455/yy/1382745084$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="87经典红楼梦" tvg-logo="https://epg.112114.free.hr/logo/87经典红楼梦.png" group-title="电视剧",87经典红楼梦
+http://43.138.170.29:35455/yy/1382745084$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://live.iill.top/yy.php?id=1354930969$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://159.75.85.63:35455/yy/1354930969$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://43.138.170.29:35455/yy/1354930969$IPV4『线路3』
+#EXTINF:-1 tvg-id="4" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+https://live.metshop.top/yy/1354490667$IPV4『线路4』
+#EXTINF:-1 tvg-id="5" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+https://lunbo.freetv.top/yy/1354930969$IPV4『线路5』
+#EXTINF:-1 tvg-id="6" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://120.77.28.4:8648/huya.php?id=26355768$IPV4『线路6』
+#EXTINF:-1 tvg-id="7" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://11.xmyxc.cn/api/php/yy.php?id=1508902755$IPV4『线路7』
+#EXTINF:-1 tvg-id="8" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://11.xmyxc.cn/api/php/yy.php?id=634132$IPV4『线路8』
+#EXTINF:-1 tvg-id="9" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+https://lunbo.freetv.top/yy/1354490667$IPV4『线路9』
+#EXTINF:-1 tvg-id="10" tvg-name="新白娘子传奇" tvg-logo="https://epg.112114.free.hr/logo/新白娘子传奇.png" group-title="电视剧",新白娘子传奇
+http://43.138.170.29:35455/yy/634132$IPV4『线路10』
+#EXTINF:-1 tvg-id="1" tvg-name="仙剑奇侠传剧" tvg-logo="https://epg.112114.free.hr/logo/仙剑奇侠传剧.png" group-title="电视剧",仙剑奇侠传剧
+http://159.75.85.63:35455/yy/1382749903$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="仙剑奇侠传剧" tvg-logo="https://epg.112114.free.hr/logo/仙剑奇侠传剧.png" group-title="电视剧",仙剑奇侠传剧
+http://43.138.170.29:35455/yy/1382749903$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="花千骨电视剧" tvg-logo="https://epg.112114.free.hr/logo/花千骨电视剧.png" group-title="电视剧",花千骨电视剧
+http://159.75.85.63:35455/yy/1354943110$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="花千骨电视剧" tvg-logo="https://epg.112114.free.hr/logo/花千骨电视剧.png" group-title="电视剧",花千骨电视剧
+http://43.138.170.29:35455/yy/1354943110$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="少年歌行剧集" tvg-logo="https://epg.112114.free.hr/logo/少年歌行剧集.png" group-title="电视剧",少年歌行剧集
+http://159.75.85.63:35455/yy/1450556636$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="少年歌行剧集" tvg-logo="https://epg.112114.free.hr/logo/少年歌行剧集.png" group-title="电视剧",少年歌行剧集
+http://43.138.170.29:35455/yy/1450556636$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="鹊刀门传奇剧" tvg-logo="https://epg.112114.free.hr/logo/鹊刀门传奇剧.png" group-title="电视剧",鹊刀门传奇剧
+http://159.75.85.63:35455/yy/1355344777$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="鹊刀门传奇剧" tvg-logo="https://epg.112114.free.hr/logo/鹊刀门传奇剧.png" group-title="电视剧",鹊刀门传奇剧
+http://43.138.170.29:35455/yy/1355344777$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="甄嬛传电视剧" tvg-logo="https://epg.112114.free.hr/logo/甄嬛传电视剧.png" group-title="电视剧",甄嬛传电视剧
+http://zby.xjqxz.top/live8/live.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="卿卿日常轮播" tvg-logo="https://epg.112114.free.hr/logo/卿卿日常轮播.png" group-title="电视剧",卿卿日常轮播
+http://zby.xjqxz.top/qqrc/live.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="知否知否轮播" tvg-logo="https://epg.112114.free.hr/logo/知否知否轮播.png" group-title="电视剧",知否知否轮播
+http://zby.xjqxz.top/zfzf/live.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="与凤行电视剧" tvg-logo="https://epg.112114.free.hr/logo/与凤行电视剧.png" group-title="电视剧",与凤行电视剧
+http://159.75.85.63:35455/huya/26355866#http://cfss.cc/cdn/hy/26355866.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="开端电视轮播" tvg-logo="https://epg.112114.free.hr/logo/开端电视轮播.png" group-title="电视剧",开端电视轮播
+http://159.75.85.63:35455/huya/11342397#http://cfss.cc/cdn/hy/11342397.m3u8$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="开端电视轮播" tvg-logo="https://epg.112114.free.hr/logo/开端电视轮播.png" group-title="电视剧",开端电视轮播
+http://cfss.cc/cdn/hy/11342397.m3u8$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="我的体育老师" tvg-logo="https://epg.112114.free.hr/logo/我的体育老师.png" group-title="电视剧",我的体育老师
+http://159.75.85.63:35455/yy/1382745169$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="我的体育老师" tvg-logo="https://epg.112114.free.hr/logo/我的体育老师.png" group-title="电视剧",我的体育老师
+http://43.138.170.29:35455/yy/1382745169$IPV4『线路2』
+#EXTINF:-1 tvg-id="3" tvg-name="我的体育老师" tvg-logo="https://epg.112114.free.hr/logo/我的体育老师.png" group-title="电视剧",我的体育老师
+https://lunbo.freetv.top/yy/1382745169$IPV4『线路3』
+#EXTINF:-1 tvg-id="1" tvg-name="后厨电视轮播" tvg-logo="https://epg.112114.free.hr/logo/后厨电视轮播.png" group-title="电视剧",后厨电视轮播
+http://159.75.85.63:35455/yy/1351059494$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="后厨电视轮播" tvg-logo="https://epg.112114.free.hr/logo/后厨电视轮播.png" group-title="电视剧",后厨电视轮播
+http://43.138.170.29:35455/yy/1351059494$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="如果岁月轮播" tvg-logo="https://epg.112114.free.hr/logo/如果岁月轮播.png" group-title="电视剧",如果岁月轮播
+http://159.75.85.63:35455/yy/1382736883$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="如果岁月轮播" tvg-logo="https://epg.112114.free.hr/logo/如果岁月轮播.png" group-title="电视剧",如果岁月轮播
+http://43.138.170.29:35455/yy/1382736883$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="流金岁月轮播" tvg-logo="https://epg.112114.free.hr/logo/流金岁月轮播.png" group-title="电视剧",流金岁月轮播
+http://159.75.85.63:35455/yy/1382749906$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="流金岁月轮播" tvg-logo="https://epg.112114.free.hr/logo/流金岁月轮播.png" group-title="电视剧",流金岁月轮播
+http://43.138.170.29:35455/yy/1382749906$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="向风而行轮播" tvg-logo="https://epg.112114.free.hr/logo/向风而行轮播.png" group-title="电视剧",向风而行轮播
+http://zby.xjqxz.top/xfex/live.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="欢乐颂电视剧" tvg-logo="https://epg.112114.free.hr/logo/欢乐颂电视剧.png" group-title="电视剧",欢乐颂电视剧
+http://159.75.85.63:35455/douyu/3756989$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="欢乐颂电视剧" tvg-logo="https://epg.112114.free.hr/logo/欢乐颂电视剧.png" group-title="电视剧",欢乐颂电视剧
+http://43.138.170.29:35455/douyu/3756989$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="好先生电视剧" tvg-logo="https://epg.112114.free.hr/logo/好先生电视剧.png" group-title="电视剧",好先生电视剧
+http://159.75.85.63:35455/douyu/9650792$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="好先生电视剧" tvg-logo="https://epg.112114.free.hr/logo/好先生电视剧.png" group-title="电视剧",好先生电视剧
+http://43.138.170.29:35455/douyu/9650792$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="我的前半生剧" tvg-logo="https://epg.112114.free.hr/logo/我的前半生剧.png" group-title="电视剧",我的前半生剧
+http://159.75.85.63:35455/yy/1382735564$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="我的前半生剧" tvg-logo="https://epg.112114.free.hr/logo/我的前半生剧.png" group-title="电视剧",我的前半生剧
+http://43.138.170.29:35455/yy/1382735564$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="伪装者电视剧" tvg-logo="https://epg.112114.free.hr/logo/伪装者电视剧.png" group-title="电视剧",伪装者电视剧
+http://159.75.85.63:35455/yy/1354936244$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="伪装者电视剧" tvg-logo="https://epg.112114.free.hr/logo/伪装者电视剧.png" group-title="电视剧",伪装者电视剧
+http://43.138.170.29:35455/yy/1354936244$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="警察荣誉轮播" tvg-logo="https://epg.112114.free.hr/logo/警察荣誉轮播.png" group-title="电视剧",警察荣誉轮播
+http://zby.xjqxz.top/live16/live.m3u8$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="雪豹电视轮播" tvg-logo="https://epg.112114.free.hr/logo/雪豹电视轮播.png" group-title="电视剧",雪豹电视轮播
+http://159.75.85.63:35455/douyu/11863823$IPV4
+#EXTINF:-1 tvg-id="1" tvg-name="火蓝刀锋轮播" tvg-logo="https://epg.112114.free.hr/logo/火蓝刀锋轮播.png" group-title="电视剧",火蓝刀锋轮播
+http://159.75.85.63:35455/yy/1382737892$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="火蓝刀锋轮播" tvg-logo="https://epg.112114.free.hr/logo/火蓝刀锋轮播.png" group-title="电视剧",火蓝刀锋轮播
+http://43.138.170.29:35455/yy/1382737892$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="二炮手电视剧" tvg-logo="https://epg.112114.free.hr/logo/二炮手电视剧.png" group-title="电视剧",二炮手电视剧
+http://159.75.85.63:35455/yy/1354930964$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="二炮手电视剧" tvg-logo="https://epg.112114.free.hr/logo/二炮手电视剧.png" group-title="电视剧",二炮手电视剧
+http://43.138.170.29:35455/yy/1354930964$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="炮神电视轮播" tvg-logo="https://epg.112114.free.hr/logo/炮神电视轮播.png" group-title="电视剧",炮神电视轮播
+http://159.75.85.63:35455/yy/22089862$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="炮神电视轮播" tvg-logo="https://epg.112114.free.hr/logo/炮神电视轮播.png" group-title="电视剧",炮神电视轮播
+http://43.138.170.29:35455/yy/22089862$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="风筝电视轮播" tvg-logo="https://epg.112114.free.hr/logo/风筝电视轮播.png" group-title="电视剧",风筝电视轮播
+http://159.75.85.63:35455/yy/1354931585$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="风筝电视轮播" tvg-logo="https://epg.112114.free.hr/logo/风筝电视轮播.png" group-title="电视剧",风筝电视轮播
+http://43.138.170.29:35455/yy/1354931585$IPV4『线路2』
+#EXTINF:-1 tvg-id="1" tvg-name="三部僵约轮播" tvg-logo="https://epg.112114.free.hr/logo/三部僵约轮播.png" group-title="电视剧",三部僵约轮播
+http://159.75.85.63:35455/douyu/9470198$IPV4『线路1』
+#EXTINF:-1 tvg-id="2" tvg-name="三部僵约轮播" tvg-logo="https://epg.112114.free.hr/logo/三部僵约轮播.png" group-title="电视剧",三部僵约轮播
+http://43.138.170.29:35455/douyu/9470198$IPV4『线路2』
 #EXTINF:-1 tvg-id="1" tvg-name="黑莓动画" tvg-logo="https://epg.112114.free.hr/logo/黑莓动画.png" group-title="少儿频道",黑莓动画
 http://[2409:8087:1a0b:df::4006]:80/ottrrs.hl.chinamobile.com/TVOD/88888888/224/3221225662/index.m3u8$IPV6『线路1』
 #EXTINF:-1 tvg-id="2" tvg-name="黑莓动画" tvg-logo="https://epg.112114.free.hr/logo/黑莓动画.png" group-title="少儿频道",黑莓动画
