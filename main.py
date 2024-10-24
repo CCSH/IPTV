@@ -101,7 +101,7 @@ def filter_source_urls(template_file):
 
     matched_channels = match_channels(template_channels, all_channels)
 
-    return matched_channels, template_channels
+    return all_channels, matched_channels, template_channels
 
 def is_ipv6(url):
     return re.match(r'^http:\/\/\[[0-9a-fA-F:]+\]', url) is not None
@@ -159,5 +159,6 @@ def updateChannelUrlsM3U(channels, template_channels, fileName):
 
 if __name__ == "__main__":
     template_file = "demo.txt"
-    channels, template_channels = filter_source_urls(template_file)
+    all_channels, channels, template_channels = filter_source_urls(template_file)
     updateChannelUrlsM3U(channels, template_channels, "live")
+    updateChannelUrlsM3U(all_channels, all_channels, "all")
