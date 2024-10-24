@@ -101,10 +101,6 @@ def filter_source_urls(template_file):
 
     matched_channels = match_channels(template_channels, all_channels)
 
-    logging.info(f"all_channels频道信息，{all_channels}")
-    logging.info(f"matched_channels频道信息，{all_channels}")
-    logging.info(f"template_channels频道信息，{all_channels}")
-
     return matched_channels, template_channels
 
 def is_ipv6(url):
