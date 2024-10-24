@@ -106,7 +106,7 @@ def filter_source_urls(template_file):
 def is_ipv6(url):
     return re.match(r'^http:\/\/\[[0-9a-fA-F:]+\]', url) is not None
 
-def updateChannelUrlsM3U(channels, template_channels，fileName):
+def updateChannelUrlsM3U(channels, template_channels, fileName):
     written_urls = set()
 
     current_date = datetime.now().strftime("%Y-%m-%d")
