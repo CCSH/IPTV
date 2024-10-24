@@ -17,6 +17,7 @@ CCTV14,
 CCTV15,
 CCTV16,
 CCTV17,
+CCCTV18,
 
 卫视频道,#genre#
 湖南卫视,
