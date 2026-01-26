@@ -27,8 +27,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "github_actions[bot]"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add ./assets/whitelist-blacklist/*
           git commit -m "黑白名单 AutoUpdate $(date +'%Y%m%d')"
 
