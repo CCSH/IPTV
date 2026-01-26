@@ -8,23 +8,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4  # 升级到最新版本
-      with:
-        fetch-depth: 0  # 获取完整的提交历史，避免推送失败
-    
-    - name: Install dependencies (if needed)
-      run: sudo apt-get update && sudo apt-get install -y wget gzip
+    - uses: actions/checkout@v3
     
     - name: Update EPG Files
       run: |
         # 删除旧文件
         rm -f e.xml e.xml.gz
         
-        # 下载EPG文件，添加失败重试和错误处理
-        if ! wget --tries=3 --timeout=30 https://epg.112114.xyz/pp.xml -O e.xml; then
-          echo "Error: Failed to download EPG file"
-          exit 1
-        fi
+        # 下载EPG文件
+        wget https://epg.112114.xyz/pp.xml -O e.xml
         
         # 压缩文件
         gzip -c e.xml > e.xml.gz
@@ -44,10 +36,6 @@ jobs:
         git commit -m "EPG Update: $(date +'%Y-%m-%d %H:%M:%S')"
     
     - name: Push changes
-      run: |
-        # 使用GITHUB_REF_NAME获取当前分支名，避免硬编码
-        git push origin HEAD:${GITHUB_REF_NAME}
+      run: git push origin main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # 只有前面步骤成功且有提交时才执行推送
-      if: success() && steps.update-epg.outputs.changes_made != 'false'
