@@ -1,6 +1,6 @@
 https://3043.kstore.space/bhvip/bhzb.txt
 https://tv.iill.top/m3u/Gather
-https://tv.iill.top/m3u/Live
+https://m.iill.top/Live.m3u
 https://tv.iill.top/m3u/Sport
 https://live.freetv.top/huyayqk.m3u
 https://live.freetv.top/douyuyqk.m3u
@@ -11,6 +11,14 @@ https://live.zbds.org/tv/iptv6.txt
 https://live.zbds.org/tv/iptv4.txt
 https://freetv.fun/test_channels_original_new.txt
 https://jihulab.com/-/snippets/5265/raw/main/.txt
+https://live.zbds.org/tv/iptv6.m3u
+https://live.zbds.org/tv/iptv4.m3u
+https://m3u.ibert.me/fmml_ipv6.m3u
+https://raw.githubusercontent.com/YueChan/Live/refs/heads/main/IPTV.m3u
+https://raw.githubusercontent.com/zwc456baby/iptv_alive/refs/heads/master/live.m3u
+https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/cnTV_AutoUpdate.m3u8
+https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u
+https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u
 https://raw.githubusercontent.com/cyalias/mytvs-github/refs/heads/main/mytv.txt
 https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8
 https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u
