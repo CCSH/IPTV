@@ -12,10 +12,10 @@ jobs:
     - name: Update EPG Files
       run: |
         rm -f e.xml && wget https://epg.112114.xyz/pp.xml -O e.xml
-        rm -f e.xml.gz && wget https://epg.112114.xyz/pp.xml -O e.xml.gz
+        gzip -c e.xml > e.xml.gz
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git add e.xml
+        git add e.xml e.xml.gz
         git commit -m "EPG Update."
     - name: Push changes
       run: git push origin main
