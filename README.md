@@ -15,5 +15,7 @@
 |[XML](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml)|[GZ](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml.gz)|
 
 ## 自动更新说明
-本仓库的 EPG 文件（e.xml / e.xml.gz）会通过 GitHub Actions 定时自动更新，更新时间为每天的 16:15、18:15、20:15、22:15、00:15、02:15、04:15、06:15、08:15、10:15、12:15、14:15（UTC 时间，对应北京时间 +8 小时）。
+本仓库的 EPG 核心文件（e.xml / e.xml.gz）由 GitHub Actions 实现全自动定时更新，更新规则如下：
+✅ 更新频率：每 6 小时更新一次
+✅ 对应北京时间：UTC+8 小时，即每日8:30、14:30、20:30、次日 2:30
 >EPG来自 https://epg.112114.xyz/
