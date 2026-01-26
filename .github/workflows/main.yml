@@ -27,8 +27,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "github_actions[bot]"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add live.txt live.m3u live_lite.txt live_lite.m3u others.txt
           git commit -m ":tada:  AutoUpdate $(date +'%Y%m%d')"
 
