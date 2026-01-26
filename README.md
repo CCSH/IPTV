@@ -13,5 +13,7 @@
 |xml|gz|
 | ---- | ---- |
 |[XML](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml)|[GZ](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml.gz)|
->直播源来自 https://epg.112114.xyz/
 
+## 自动更新说明
+本仓库的 EPG 文件（e.xml / e.xml.gz）会通过 GitHub Actions 定时自动更新，更新时间为每天的 16:15、18:15、20:15、22:15、00:15、02:15、04:15、06:15、08:15、10:15、12:15、14:15（UTC 时间，对应北京时间 +8 小时）。
+>EPG来自 https://epg.112114.xyz/
