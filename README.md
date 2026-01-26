@@ -13,5 +13,5 @@
 |xml|gz|
 | ---- | ---- |
 |[XML](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml)|[GZ](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml.gz)|
-#直播源来自 https://epg.112114.xyz/
+>直播源来自 https://epg.112114.xyz/
 
