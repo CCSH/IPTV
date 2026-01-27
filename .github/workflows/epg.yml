@@ -25,35 +25,27 @@ jobs:
           "https://epg.zsdc.eu.org/t.xml"
           "http://e.erw.cc/all.xml"
         )
-        
-        # 循环尝试下载，直到成功或所有源都失败
+
+        # 循环尝试下载，强制忽略wget报错，继续执行
         DOWNLOAD_SUCCESS=0
         for SOURCE in "${EPG_SOURCES[@]}"; do
           echo "尝试下载EPG源: $SOURCE"
-          # wget参数说明：
-          # -q 静默模式 -T 超时时间10秒 -O 输出文件 -t 重试2次
-          wget -q -T 20 -O e.xml "$SOURCE" -t 2
+          wget -q -T 20 -O e.xml "$SOURCE" -t 2 || true
           
-          # 检查下载是否成功且文件非空
-          if [ $? -eq 0 ] && [ -s e.xml ]; then
+          # 检查文件是否存在且非空（核心判断，替代wget返回值）
+          if [ -f e.xml ] && [ -s e.xml ]; then
             echo "成功下载EPG源: $SOURCE"
             DOWNLOAD_SUCCESS=1
-            break  # 成功则跳出循环
+            break
           else
             echo "EPG源 $SOURCE 下载失败或文件为空，尝试下一个源"
-            rm -f e.xml  # 删除失败的空文件
+            rm -f e.xml  # 删除失败的文件
           fi
         done
         
         # 所有源都失败时终止任务
         if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
-          echo "所有EPG源下载失败，任务终止"
-          exit 1
-        fi
-        
-        # 检查文件是否非空，避免提交空文件
-        if [ ! -s e.xml ]; then
-          echo "下载的EPG文件为空，任务终止"
+          echo "❌ 所有EPG源下载失败，任务终止"
           exit 1
         fi
         
