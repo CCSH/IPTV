@@ -44,5 +44,5 @@
 ## 📜 许可证
 MIT License © [CCSH]
 
-## 赞赏码
+## 🎁 赞赏码
 ![image](https://raw.githubusercontent.com/CCSH/CCSH/refs/heads/main/ccsh.png)
