@@ -2,6 +2,7 @@ name: EPG Update
 on:
   schedule:
     - cron: '30 16,20,0,4,8,12 * * *'
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
