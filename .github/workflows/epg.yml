@@ -1,13 +1,18 @@
 name: EPG Update
 on:
   schedule:
-    - cron: '30 16,20,0,4,8,12 * * *'
-  workflow_dispatch:
+    - cron: '30 16,20,0,4,8,12 * * *'  # 北京时间0:30起每4小时更新
+  workflow_dispatch:  # 保留手动触发
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:  # 新增：授予推送代码的权限（必加）
+      contents: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4  # 升级到最新版，兼容性更好
+      with:
+        fetch-depth: 0  # 新增：获取完整仓库历史，避免提交失败
     
     - name: Update EPG Files
       run: |
@@ -17,6 +22,12 @@ jobs:
         # 下载EPG文件
         wget https://epg.112114.xyz/pp.xml -O e.xml
         
+        # 新增：检查文件是否非空，避免提交空文件
+        if [ ! -s e.xml ]; then
+          echo "下载的EPG文件为空，任务终止"
+          exit 1
+        fi
+        
         # 压缩文件
         gzip -c e.xml > e.xml.gz
         
@@ -24,10 +35,22 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         
-        # 提交变更
-        git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')
+        # 新增：添加文件到暂存区
+        git add e.xml e.xml.gz
+        
+        # 新增：检查是否有变更，无变更则跳过提交（核心修复）
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+          exit 0
+        fi
+        
+        # 修复：闭合引号，添加CST标注便于识别时区
+        git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
     
     - name: Push changes
-      run: git push origin main
+      run: |
+        # 新增：拉取最新代码避免冲突，再推送（修复推送失败问题）
+        git pull --rebase origin main || true
+        git push origin main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
