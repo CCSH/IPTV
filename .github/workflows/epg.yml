@@ -1,9 +1,7 @@
 name: EPG Update
 on:
-  push:
   schedule:
     - cron: '30 */6 * * *'
-
 jobs:
   build:
     runs-on: ubuntu-latest
