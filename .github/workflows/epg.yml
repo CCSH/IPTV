@@ -24,15 +24,8 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         
-        # 添加文件并检查是否有变更，无变更则跳过提交
-        git add e.xml e.xml.gz
-        if git diff --cached --quiet; then
-          echo "No changes to commit"
-          exit 0
-        fi
-        
         # 提交变更
-        git commit -m "EPG Update: $(date +'%Y-%m-%d %H:%M:%S')"
+        git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')
     
     - name: Push changes
       run: git push origin main
