@@ -22,7 +22,7 @@ jobs:
         # 定义EPG源列表（按优先级排序，可自行增减）
         EPG_SOURCES=(
           "https://epg.112114.xyz/pp.xml"
-          "http://e.erw.cc/all.xml"
+          "http://e.erw.cc/e.xml"
           "https://epg.zsdc.eu.org/t.xml"
           "http://epg.51zmt.top:8000/e1.xml"
         )
