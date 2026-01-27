@@ -22,7 +22,7 @@ jobs:
         # 下载EPG文件
         wget https://epg.112114.xyz/pp.xml -O e.xml
         
-        # 新增：检查文件是否非空，避免提交空文件
+        # 检查文件是否非空，避免提交空文件
         if [ ! -s e.xml ]; then
           echo "下载的EPG文件为空，任务终止"
           exit 1
@@ -44,12 +44,11 @@ jobs:
           exit 0
         fi
         
-        # 修复：闭合引号，添加CST标注便于识别时区
+        # 提交更新
         git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
     
     - name: Push changes
       run: |
-        # 新增：拉取最新代码避免冲突，再推送（修复推送失败问题）
         git pull --rebase origin main || true
         git push origin main
       env:
