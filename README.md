@@ -1,6 +1,6 @@
 # 直播源&EPG网络采集工具
 
-轻量的直播源、EPG电子节目指南网络采集同步工具，自动拉取公开资源并格式化输出，适配IPTV/电视盒子等常用场景。
+免费轻量的直播源、EPG电子节目指南网络采集同步工具，自动拉取公开资源并格式化输出，适配IPTV/电视盒子等常用场景。
 
 ## 📁 文件下载
 ### 直播源
@@ -43,3 +43,6 @@
 
 ## 📜 许可证
 MIT License © [CCSH]
+
+## 赞赏码
+![image](https://raw.githubusercontent.com/CCSH/CCSH/refs/heads/main/ccsh.png)
