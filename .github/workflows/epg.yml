@@ -57,10 +57,10 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         
-        # 新增：添加文件到暂存区
+        # 添加文件到暂存区
         git add e.xml e.xml.gz
         
-        # 新增：检查是否有变更，无变更则跳过提交（核心修复）
+        # 检查是否有变更，无变更则跳过提交（核心修复）
         if git diff --cached --quiet; then
           echo "No changes to commit"
           exit 0
