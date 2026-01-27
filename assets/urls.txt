@@ -1,3 +1,12 @@
+https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u
+https://live.hacks.tools/tv/ipv4/categories/hong_kong.m3u
+https://live.hacks.tools/tv/ipv4/categories/macau.m3u
+https://t.freetv.fun/m3u/playlist.m3u
+https://live.hacks.tools/tv/ipv4/categories/央视频道.m3u
+https://live.hacks.tools/tv/iptv4.m3u
+https://raw.githubusercontent.com/kimwang1978/collect-tv-txt/main/others_output.txt
+https://raw.githubusercontent.com/Guovin/iptv-database/master/result.txt
+https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/countries/cn.m3u
 https://3043.kstore.space/bhvip/bhzb.txt
 https://tv.iill.top/m3u/Gather
 https://m.iill.top/Live.m3u
@@ -67,3 +76,4 @@ https://m3u.ibert.me/txt/ycl_iptv.txt
 https://m3u.ibert.me/txt/y_g.txt
 https://gitee.com/tushaoyong/live/raw/master/%E6%8E%A5%E5%8F%A3/IPV6.txt
 http://tot.totalh.net/tttt.txt
+
