@@ -1,8 +1,3 @@
-## 更新频率(北京时间)
-|直播源|黑白名单|
-| ---- | ---- |
-|每日4点|每周五0点|
-
 ## 直播源
 ||完整|精简|其他|
 | ---- | ---- | ---- | ---- |
@@ -14,9 +9,17 @@
 | ---- | ---- |
 |[XML](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml)|[GZ](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/e.xml.gz)|
 
-## 自动更新说明
-本仓库的 EPG 核心文件（e.xml / e.xml.gz）由 GitHub Actions 实现全自动定时更新，更新规则如下：
+## 自动更新说明（北京时间）
+本仓库的 直播源 文件由 GitHub Actions 实现全自动定时更新，更新规则如下：
 
-✅ 更新频率：每 4 小时更新一次
+✅ 更新频率：每日 0 点更新一次
+
+本仓库的 黑白名单 文件由 GitHub Actions 实现全自动定时更新，更新规则如下：
+
+✅ 更新频率：每周四 4 点更新一次
+
+本仓库的 EPG 文件由 GitHub Actions 实现全自动定时更新，更新规则如下：
+
+✅ 更新频率：从 0:30 开始每 4 小时更新一次
 
 >EPG来自 https://epg.112114.xyz/
