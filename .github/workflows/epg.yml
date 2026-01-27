@@ -1,26 +1,55 @@
 name: EPG Update
 on:
   schedule:
-    - cron: '30 16,20,0,4,8,12 * * *'  # 北京时间0:30起每4小时更新
-  workflow_dispatch:  # 保留手动触发
+    - cron: '30 16,20,0,4,8,12 * * *'  
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:  # 新增：授予推送代码的权限（必加）
+    permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4  # 升级到最新版，兼容性更好
+    - uses: actions/checkout@v4 
       with:
-        fetch-depth: 0  # 新增：获取完整仓库历史，避免提交失败
+        fetch-depth: 0
     
     - name: Update EPG Files
       run: |
         # 删除旧文件
         rm -f e.xml e.xml.gz
         
-        # 下载EPG文件
-        wget https://epg.112114.xyz/pp.xml -O e.xml
+        # 定义EPG源列表（按优先级排序，可自行增减）
+        EPG_SOURCES=(
+          "https://epg.112114.xyz/pp.xml"
+          "https://epg.zsdc.eu.org/t.xml"
+          "http://e.erw.cc/all.xml"
+        )
+        
+        # 循环尝试下载，直到成功或所有源都失败
+        DOWNLOAD_SUCCESS=0
+        for SOURCE in "${EPG_SOURCES[@]}"; do
+          echo "尝试下载EPG源: $SOURCE"
+          # wget参数说明：
+          # -q 静默模式 -T 超时时间10秒 -O 输出文件 -t 重试2次
+          wget -q -T 20 -O e.xml "$SOURCE" -t 2
+          
+          # 检查下载是否成功且文件非空
+          if [ $? -eq 0 ] && [ -s e.xml ]; then
+            echo "成功下载EPG源: $SOURCE"
+            DOWNLOAD_SUCCESS=1
+            break  # 成功则跳出循环
+          else
+            echo "EPG源 $SOURCE 下载失败或文件为空，尝试下一个源"
+            rm -f e.xml  # 删除失败的空文件
+          fi
+        done
+        
+        # 所有源都失败时终止任务
+        if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
+          echo "所有EPG源下载失败，任务终止"
+          exit 1
+        fi
         
         # 检查文件是否非空，避免提交空文件
         if [ ! -s e.xml ]; then
