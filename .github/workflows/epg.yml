@@ -22,8 +22,9 @@ jobs:
         # 定义EPG源列表（按优先级排序，可自行增减）
         EPG_SOURCES=(
           "https://epg.112114.xyz/pp.xml"
-          "https://epg.zsdc.eu.org/t.xml"
           "http://e.erw.cc/all.xml"
+          "https://epg.zsdc.eu.org/t.xml"
+          "http://epg.51zmt.top:8000/e1.xml"
         )
 
         # 循环尝试下载，强制忽略wget报错，继续执行
