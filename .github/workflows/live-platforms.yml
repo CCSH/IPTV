@@ -1,14 +1,15 @@
 name: Live Platforms
 on:
-  schedule: [{ cron: '0 */2 * * *' }] # 每2小时自动触发，可改/删
-  workflow_dispatch: # 手动触发（必备，方便测试）
-permissions: contents: write # 赋予提交代码权限
+  schedule:
+    - cron: '0 */2 * * *'        # 每2小时触发（UTC）
+  workflow_dispatch:             # 手动触发
+permissions: contents: write     # 赋予提交代码权限
 
 jobs:
   merge-m3u:
     runs-on: ubuntu-latest
     env:
-      MERGED_M3U: "live_platforms.m3u" # 合并后的最终M3U文件名
+      MERGED_M3U: "live_platforms.m3u" # 合并后的最终合集文件名
       TIMEOUT: 15 # 下载超时（秒）
       RETRY: 3    # 下载重试次数
     steps:
@@ -17,50 +18,62 @@ jobs:
       - name: 下载并合并所有M3U
         run: |
           set -e
-          # ========== 核心配置：替换成你的所有M3U链接，一行一个 ==========
+          # 待下载的4个M3U源链接
           M3U_URLS=(
             "https://sub.ottiptv.cc/huyayqk.m3u"
             "https://sub.ottiptv.cc/douyuyqk.m3u"
             "https://sub.ottiptv.cc/bililive.m3u"
             "https://sub.ottiptv.cc/yylunbo.m3u"
           )
-          # ==============================================================
 
           # 通用下载函数：带重试、非空校验，失败不覆盖旧文件
           download() {
             local url=$1 out=$2 tmp=${out}.tmp attempt=1
             rm -f $tmp
             while [ $attempt -le $RETRY ]; do
-              wget -q --timeout=$TIMEOUT "$url" -O $tmp && [ -s $tmp ] && { mv $tmp $out; echo "✅ 下载成功：$out"; return 0; }
+              if wget -q --timeout=$TIMEOUT "$url" -O $tmp && [ -s $tmp ]; then
+                mv $tmp $out
+                echo "✅ 下载成功：$out"
+                return 0 # 拆分换行，修复日志错乱
+              fi
               sleep $attempt && attempt=$((attempt+1))
             done
             rm -f $tmp && echo "⚠️ 下载失败：$out，保留旧文件"
           }
 
-          # 1. 下载所有M3U链接（自动提取纯文件名，剔除链接参数）
-          echo "📥 开始下载M3U链接"
+          # 1. 下载所有M3U链接
+          echo "📥 开始下载M3U源文件"
           for url in "${M3U_URLS[@]}"; do
             fn=$(basename "$url" | cut -d'?' -f1 | cut -d'&' -f1)
             download "$url" "$fn"
           done
 
-          # 2. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
+          # 2. 专属处理：yylunbo.m3u 域名替换（sub → yylunbo）
+          if [ -s "yylunbo.m3u" ]; then
+            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' "yylunbo.m3u"
+            echo "🔧 已替换yylunbo.m3u域名：sub.ottiptv.cc → yylunbo.ottiptv.cc"
+          fi
+
+          # 3. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
           echo "🔗 开始合并为 ${MERGED_M3U}"
-          echo "#EXTM3U" > $MERGED_M3U # M3U标准头（播放器必识别）
+          echo "#EXTM3U" > $MERGED_M3U # M3U播放器标准头
           tmp=$(mktemp)
-          # 遍历所有M3U，跳过自身头、过滤空行，汇总内容
           for f in *.m3u; do [ -s $f ] && sed '1d' $f | grep -v '^$' >> $tmp; done
-          # 核心去重：按M3U成对格式（#EXTINF行+播放地址行），基于地址去重
           awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' $tmp >> $MERGED_M3U
           rm -f $tmp
 
-          # 3. Git自动提交（仅文件有变更时提交，无冗余记录）
+          # 4. 关键修复：删除4个源M3U，仅保留合并后的最终合集
+          rm -f huyayqk.m3u douyuyqk.m3u bililive.m3u yylunbo.m3u
+          echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
+
+          # 5. Git配置+有变更才提交
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           if git diff --quiet -- *.m3u; then
             echo "ℹ️ 无M3U文件变更，跳过提交" && exit 0
           fi
-          git add *.m3u && git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+          git add *.m3u
+          git commit -m "Live Platforms: auto update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
 
       - name: 推送合并结果到仓库
         run: git push origin ${{ github.ref_name }}
