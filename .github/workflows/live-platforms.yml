@@ -16,13 +16,13 @@ jobs:
 
       - name: 下载并合并所有M3U
         run: |
-          set +e # 核心1：关闭严格模式，单个命令失败不终止整体脚本
-          # 待下载的3个M3U源链接（注释YY轮播）
+          set +e
+          # 待下载M3U源链接
           M3U_URLS=(
             "https://sub.ottiptv.cc/huyayqk.m3u"
             "https://sub.ottiptv.cc/douyuyqk.m3u"
             "https://sub.ottiptv.cc/bililive.m3u"
-            # "https://sub.ottiptv.cc/yylunbo.m3u"
+            "https://sub.ottiptv.cc/yylunbo.m3u"
           )
 
           # 通用下载函数：加容错，屏蔽错误输出
@@ -47,11 +47,11 @@ jobs:
             download "$url" "$fn"
           done
 
-          # YY轮播相关逻辑，全部注释
-          # if [ -s "yylunbo.m3u" ]; then
-          #   sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
-          #   echo "🔧 YY轮播域名替换完成"
-          # fi
+          YY轮播相关逻辑，全部注释
+          if [ -s "yylunbo.m3u" ]; then
+            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
+            echo "🔧 YY轮播域名替换完成"
+          fi
 
           # 2. 合并所有M3U为单个文件（全容错改造，解决核心报错）
           echo "🔗 开始合并为 ${MERGED_M3U}"
@@ -68,16 +68,17 @@ jobs:
           [ -s "$tmp" ] && awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' "$tmp" >> "${MERGED_M3U}" 2>/dev/null
           rm -f "$tmp" 2>/dev/null
 
-          # 3. 删除其他源M3U，仅保留合并后的文件（保留原有写法，加容错）
+          # 3. 删除其他源M3U，仅保留合并后的文件
           find . -maxdepth 1 -name "*.m3u" ! -name "${MERGED_M3U}" -delete 2>/dev/null
           echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
 
-          # 4. Git配置+有变更才提交（保留原有逻辑）
+          # 4. Git配置+有变更才提交
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
           if [ -f "${MERGED_M3U}" ] && ! git diff --quiet -- "${MERGED_M3U}"; then
             git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: auto update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
             echo "✅ 合并文件已提交"
           else
             echo "ℹ️ 无M3U文件变更，跳过提交"
