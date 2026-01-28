@@ -42,6 +42,9 @@ jobs:
             rm -f $tmp 2>/dev/null && echo "⚠️ 下载失败：$out，保留旧文件"
           }
 
+          find . -maxdepth 1 -name "*.m3u" -delete 2>/dev/null
+          echo "🗑️  前置清理完成：删除当前目录所有旧的M3U文件"
+
           # 1. 下载所有M3U链接
           echo "📥 开始下载M3U源文件"
           for url in "${M3U_URLS[@]}"; do
@@ -92,6 +95,7 @@ jobs:
 
       - name: 推送合并结果到仓库
         run: |
-          git push origin ${{ github.ref_name }} 2>/dev/null || echo "ℹ️ 无内容可推送"
+          git pull --rebase origin main || true
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
