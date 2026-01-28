@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: '0 */2 * * *'        # 每2小时触发（UTC）
   workflow_dispatch:             # 手动触发
-permissions: contents: write     # 赋予提交代码权限
 
 jobs:
   merge-m3u:
