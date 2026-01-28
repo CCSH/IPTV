@@ -1,4 +1,4 @@
-name: Logo Update - 克隆仓库全量同步（修复空文件）
+name: Logo Update
 on:
   workflow_dispatch:
   schedule:
@@ -14,7 +14,7 @@ jobs:
       - name: 创建logo目录
         run: mkdir -p logo
 
-      - name: 克隆目标仓库+筛选所有PNG（过滤空文件）
+      - name: 克隆目标仓库+筛选所有PNG
         run: |
           # ========== 配置要克隆的仓库列表 ==========
           REPOS=(
@@ -39,7 +39,7 @@ jobs:
               [ -z "$PNG_FILE" ] && continue
               # 提取文件名
               FILENAME=$(basename "$PNG_FILE")
-              # 过滤空文件名/仅后缀的文件（核心修复）
+              # 过滤空文件名/仅后缀的文件
               if [ -z "$FILENAME" ] || [ "$FILENAME" == ".png" ] || [[ ! "$FILENAME" =~ ^.+?\.png$ ]]; then
                 echo "⚠️ 无效文件名：$FILENAME → 跳过"
                 continue
