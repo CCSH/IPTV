@@ -21,7 +21,7 @@ jobs:
             "https://sub.ottiptv.cc/huyayqk.m3u"
             "https://sub.ottiptv.cc/douyuyqk.m3u"
             "https://sub.ottiptv.cc/bililive.m3u"
-            "https://sub.ottiptv.cc/yylunbo.m3u"
+            # "https://sub.ottiptv.cc/yylunbo.m3u"
           )
 
           # 通用下载函数：带重试、非空校验，失败不覆盖旧文件
@@ -47,10 +47,10 @@ jobs:
           done
 
           # YY轮播域名替换，否则该源播放失败
-          if [ -s "yylunbo.m3u" ]; then
-            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
-            echo "🔧 YY轮播域名替换完成：sub → yylunbo"
-          fi
+          # if [ -s "yylunbo.m3u" ]; then
+          #   sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
+          #   echo "🔧 YY轮播域名替换完成"
+          # fi
 
           # 2. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
           echo "🔗 开始合并为 ${MERGED_M3U}"
