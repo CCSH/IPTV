@@ -7,9 +7,9 @@
 ## 📁 资源直链（直接调用）
 
 ### 直播源 (Live Channels)
-支持 TXT 和 M3U 两种格式，提供完整版、精简版及特色频道版本。
+支持 TXT 和 M3U 两种格式，提供完整版、精简版、直播平台轮博及其他未收入频道版本。
 
-| 格式 | 完整版（含地方台） | 精简版（不含地方台） | 直播平台（虎牙、斗鱼、B站、YY） | 剩余其他频道 |
+| 格式 | 完整版（含地方台等） | 精简版（不含地方台等） | 直播平台（虎牙、斗鱼、B站、YY） | 其他未收入频道 |
 | :--- | :--- | :--- | :--- | :--- |
 | **TXT** | [live.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.txt) | [live_lite.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.txt) | — | [other.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/others.txt) |
 | **M3U** | [live.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u) | [live_lite.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.m3u) | [live_platforms.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_platforms.m3u) | — |
