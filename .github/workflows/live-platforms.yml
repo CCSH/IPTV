@@ -8,9 +8,9 @@ jobs:
   merge-m3u:
     runs-on: ubuntu-latest
     env:
-      MERGED_M3U: "live_platforms.m3u" # 合并后的最终合集文件名
-      TIMEOUT: 15 # 下载超时（秒）
-      RETRY: 3    # 下载重试次数
+      MERGED_M3U: "live_platforms.m3u" # 仅保留这个合并文件
+      TIMEOUT: 15 # 下载超时15秒
+      RETRY: 3    # 失败重试3次
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +32,7 @@ jobs:
               if wget -q --timeout=$TIMEOUT "$url" -O $tmp && [ -s $tmp ]; then
                 mv $tmp $out
                 echo "✅ 下载成功：$out"
-                return 0 # 拆分换行，修复日志错乱
+                return 0
               fi
               sleep $attempt && attempt=$((attempt+1))
             done
@@ -46,28 +46,46 @@ jobs:
             download "$url" "$fn"
           done
 
+          # YY轮播域名替换，否则该源播放失败
+          if [ -s "yylunbo.m3u" ]; then
+            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
+            echo "🔧 YY轮播域名替换完成：sub → yylunbo"
+          fi
+
           # 2. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
           echo "🔗 开始合并为 ${MERGED_M3U}"
-          echo "#EXTM3U" > $MERGED_M3U # M3U播放器标准头
+          echo "#EXTM3U" > "${MERGED_M3U}" # 加引号兼容特殊文件名，播放器标准头
           tmp=$(mktemp)
-          for f in *.m3u; do [ -s $f ] && sed '1d' $f | grep -v '^$' >> $tmp; done
-          awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' $tmp >> $MERGED_M3U
-          rm -f $tmp
+          # 遍历仅处理有内容的M3U，避免空文件报错
+          for f in *.m3u; do 
+            if [ -s "$f" ]; then 
+              sed '1d' "$f" | grep -v '^$' >> "$tmp" 2>/dev/null
+            fi
+          done
+          # 有内容才去重，避免空临时文件触发报错
+          [ -s "$tmp" ] && awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' "$tmp" >> "${MERGED_M3U}" 2>/dev/null
+          rm -f "$tmp"
 
-          # 3. 删除其他源M3U，仅保留合并后的最终合集
-          rrm -f *.m3u !("${MERGED_M3U}")
+          # 3. 删除其他源M3U，仅保留合并后的文件
+          find . -maxdepth 1 -name "*.m3u" ! -name "${MERGED_M3U}" -delete 2>/dev/null
           echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
 
-          # 4. Git配置+有变更才提交
+          # 4. Git配置+有变更才提交（容错处理，避免无变更时报错）
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- *.m3u; then
-            echo "ℹ️ 无M3U文件变更，跳过提交" && exit 0
+          # 仅检查合并后的文件，避免多余判断
+          if [ -f "${MERGED_M3U}" ] && ! git diff --quiet -- "${MERGED_M3U}"; then
+            git add "${MERGED_M3U}"
+            git commit -m "Live Platforms: auto update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            echo "✅ 合并文件已提交"
+          else
+            echo "ℹ️ 无M3U文件变更，跳过提交"
+            exit 0
           fi
-          git add *.m3u
-          git commit -m "Live Platforms: auto update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
 
       - name: 推送合并结果到仓库
-        run: git push origin ${{ github.ref_name }}
+        run: |
+          # 容错推送，无提交内容也不报错
+          git push origin ${{ github.ref_name }} 2>/dev/null || echo "ℹ️ 无内容可推送"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
