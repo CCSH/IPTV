@@ -1,4 +1,4 @@
-name: 'Daily Job'
+name: 'Live Update'
 
 on:
   schedule:
