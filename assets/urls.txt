@@ -6,6 +6,11 @@ https://live.freetv.top/huyayqk.m3u
 https://live.freetv.top/douyuyqk.m3u
 https://live.zhoujie218.top/tv/iptv4.txt
 https://iptv.zsdc.eu.org/home/iptv.m3u8
+https://t.freetv.fun/m3u/playlist.txt
+https://t.freetv.fun/m3u/taiwan.txt
+https://t.freetv.fun/m3u/hong_kong.txt
+https://t.freetv.fun/m3u/macao.txt
+https://t.freetv.fun/m3u/japan.txt
 https://live.hacks.tools/tv/ipv4/categories/地方频道.m3u
 https://live.hacks.tools/tv/ipv4/categories/电影频道.m3u
 https://live.hacks.tools/tv/ipv4/categories/儿童频道.m3u
@@ -21,9 +26,6 @@ https://live.hacks.tools/tv/ipv4/categories/游戏频道.m3u
 https://live.hacks.tools/tv/ipv4/categories/直播中国.m3u
 https://live.hacks.tools/tv/ipv4/categories/综艺频道.m3u
 https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u
-https://live.hacks.tools/tv/ipv4/categories/hong_kong.m3u
-https://live.hacks.tools/tv/ipv4/categories/macau.m3u
-https://live.hacks.tools/tv/ipv4/categories/taiwan.m3u
 https://tv.850930.xyz/kdsb.txt
 https://tv.850930.xyz/pix.m3u
 https://live.zbds.org/tv/iptv6.txt
