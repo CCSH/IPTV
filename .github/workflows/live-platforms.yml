@@ -17,7 +17,7 @@ jobs:
       - name: 下载并合并所有M3U
         run: |
           set +e
-          # 待下载M3U源链接
+          # 待下载M3U源链接（恢复4个源：虎牙+斗鱼+B站+YY轮播）
           M3U_URLS=(
             "https://sub.ottiptv.cc/huyayqk.m3u"
             "https://sub.ottiptv.cc/douyuyqk.m3u"
@@ -47,24 +47,22 @@ jobs:
             download "$url" "$fn"
           done
 
-          YY轮播相关逻辑，全部注释
+          # YY轮播相关逻辑，全部注释
           if [ -s "yylunbo.m3u" ]; then
             sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
-            echo "🔧 YY轮播域名替换完成"
+            echo "🔧 YY轮播域名替换完成：sub → yylunbo"
           fi
 
-          # 2. 合并所有M3U为单个文件（全容错改造，解决核心报错）
+          # 2. 合并所有M3U为单个文件（全容错）
           echo "🔗 开始合并为 ${MERGED_M3U}"
-          echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null # 屏蔽写入错误
+          echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null # 播放器标准头
           tmp=$(mktemp)
-          touch "$tmp" # 核心2：确保临时文件一定存在，避免空文件报错
-          # 遍历仅处理有内容的M3U，屏蔽所有错误
+          touch "$tmp"
           for f in *.m3u; do 
             if [ -s "$f" ]; then 
               sed '1d' "$f" | grep -v '^$' >> "$tmp" 2>/dev/null
             fi
           done
-          # 有内容才去重，无内容直接跳过，屏蔽awk错误
           [ -s "$tmp" ] && awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' "$tmp" >> "${MERGED_M3U}" 2>/dev/null
           rm -f "$tmp" 2>/dev/null
 
@@ -72,22 +70,26 @@ jobs:
           find . -maxdepth 1 -name "*.m3u" ! -name "${MERGED_M3U}" -delete 2>/dev/null
           echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
 
-          # 4. Git配置+有变更才提交
+          # 4. Git配置+提交
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           
-          if [ -f "${MERGED_M3U}" ] && ! git diff --quiet -- "${MERGED_M3U}"; then
+          # 核心优化：首次运行（文件不存在）强制提交，后续仅变更提交
+          if [ ! -f "${MERGED_M3U}" ]; then
             git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
-            echo "✅ 合并文件已提交"
+            git commit -m "Live Platforms: init - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            echo "✅ 首次运行，初始化合并文件并提交"
+          elif ! git diff --quiet -- "${MERGED_M3U}"; then
+            git add "${MERGED_M3U}"
+            git commit -m "Live Platforms: update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            echo "✅ 合并文件有更新，提交成功"
           else
             echo "ℹ️ 无M3U文件变更，跳过提交"
-            exit 0 # 正常退出，不标为失败
+            exit 0
           fi
 
       - name: 推送合并结果到仓库
         run: |
-          # 容错推送，无内容也不报错
           git push origin ${{ github.ref_name }} 2>/dev/null || echo "ℹ️ 无内容可推送"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
