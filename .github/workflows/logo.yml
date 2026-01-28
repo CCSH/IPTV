@@ -53,19 +53,15 @@ jobs:
             rm -rf "temp_$REPO_TAG"
           done
 
-      # 4. 提交并推送同步后的文件到自己的仓库
-      - name: 提交并推送变更
+      - name: 提交推送
         run: |
-          # 配置git用户信息
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 检查logo目录是否有文件变更
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           if git status --porcelain | grep -q "logo/"; then
             git add logo/*
             git commit -m "Logo Update: $(date +'%Y-%m-%d')"
             git push
-            echo "✅ 所有仓库PNG文件同步完成！"
+            echo "✅ 同步完成！"
           else
-            echo "ℹ️ 没有新的PNG文件需要同步"
+            echo "ℹ️ 无新文件需要同步"
           fi
