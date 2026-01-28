@@ -20,33 +20,37 @@ jobs:
       # 3. 同步的多仓库列表 + 循环下载PNG
       - name: 循环同步多仓库PNG文件
         run: |
-          # ========== 核心配置：添加/删除仓库只需修改这里 ==========
-          # 格式："仓库API地址|自定义标识"（标识用于日志区分）
+          # ========== 配置要克隆的仓库列表 ==========
+          # 格式："仓库地址|目标目录|自定义标识"
           REPOS=(
-            "https://api.github.com/repos/fanmingming/live/contents/tv"
-            "https://api.github.com/repos/sparkssssssssss/epg/contents/logo"
+            "https://github.com/fanmingming/live.git|tv|fanmingming-live"
+            "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
           )
 
-          # 循环处理每个仓库
+          # 循环克隆每个仓库并复制PNG
           for REPO in "${REPOS[@]}"; do
-            API_URL=$(echo "$REPO" | cut -d'|' -f1)
-            REPO_NAME=$(echo "$REPO" | cut -d'|' -f2)
-            echo -e "\n===== 开始同步：$REPO_NAME ====="
+            # 拆分配置
+            REPO_URL=$(echo "$REPO" | cut -d'|' -f1)
+            TARGET_DIR=$(echo "$REPO" | cut -d'|' -f2)
+            REPO_TAG=$(echo "$REPO" | cut -d'|' -f3)
             
-            # 获取PNG下载链接并循环下载
-            RESPONSE=$(curl -s "$API_URL")
-            echo "$RESPONSE" | jq -r '.[] | select(.name | endswith(".png")) | .download_url' | while read -r URL; do
-              if [ -n "$URL" ]; then
-                FILENAME=$(basename "$URL")
-                # 关键：判断logo目录下是否已存在该文件，存在则跳过，不存在才下载
-                if [ -f "logo/$FILENAME" ]; then
-                  echo "⚠️ $FILENAME 已存在（高优先级），跳过本仓库版本"
-                else
-                  echo "下载 $REPO_NAME：$FILENAME"
-                  curl -s -o "logo/$FILENAME" "$URL" || echo "⚠️ $FILENAME 下载失败，跳过"
-                fi
+            echo -e "\n===== 处理仓库：$REPO_TAG ====="
+            # 克隆仓库（浅克隆，只拉最新版本，速度快）
+            git clone --depth 1 "$REPO_URL" "temp_$REPO_TAG"
+            
+            # 递归查找所有PNG文件，复制到logo目录（已存在则跳过）
+            find "temp_$REPO_TAG/$TARGET_DIR" -name "*.png" -type f | while read -r PNG_FILE; do
+              FILENAME=$(basename "$PNG_FILE")
+              if [ -f "logo/$FILENAME" ]; then
+                echo "⚠️ $FILENAME 已存在，跳过"
+              else
+                cp "$PNG_FILE" logo/
+                echo "✅ 复制：$FILENAME"
               fi
             done
+            
+            # 删除临时仓库，节省空间
+            rm -rf "temp_$REPO_TAG"
           done
 
       # 4. 提交并推送同步后的文件到自己的仓库
