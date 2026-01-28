@@ -1,7 +1,7 @@
 name: Live Platforms
 on:
   schedule:
-    - cron: '0 */2 * * *'        # 每2小时触发（UTC）
+    - cron: '0 16/2 * * *'        # 每2小时触发（UTC）
   workflow_dispatch:             # 手动触发
 
 jobs:
