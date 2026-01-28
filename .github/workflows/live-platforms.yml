@@ -13,6 +13,8 @@ jobs:
       RETRY: 3    # 失败重试3次
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 下载并合并所有M3U
         run: |
@@ -53,7 +55,7 @@ jobs:
             echo "🔧 YY轮播域名替换完成：sub → yylunbo"
           fi
 
-          # 2. 合并所有M3U为单个文件（全容错）
+          # 2. 合并所有M3U为单个文件
           echo "🔗 开始合并为 ${MERGED_M3U}"
           echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null # 播放器标准头
           tmp=$(mktemp)
@@ -77,11 +79,11 @@ jobs:
           # 核心优化：首次运行（文件不存在）强制提交，后续仅变更提交
           if [ ! -f "${MERGED_M3U}" ]; then
             git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: init - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
             echo "✅ 首次运行，初始化合并文件并提交"
           elif ! git diff --quiet -- "${MERGED_M3U}"; then
             git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: update - $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
             echo "✅ 合并文件有更新，提交成功"
           else
             echo "ℹ️ 无M3U文件变更，跳过提交"
