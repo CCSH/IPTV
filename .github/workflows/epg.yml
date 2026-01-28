@@ -1,116 +1,77 @@
-name: Logo Update
-
+name: EPG Update
 on:
-  workflow_dispatch:  # 手动触发
   schedule:
-    - cron: '0 0 * * *'  # 每天UTC0点=北京时间8点
+    - cron: '30 16,20,0,4,8,12 * * *'  
+  workflow_dispatch:
 
 jobs:
-  run-jobs:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      # 1. 检出自己的仓库
-      - name: 检出本仓库
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4 
+      with:
+        fetch-depth: 0
+    
+    - name: Update EPG Files
+      run: |
+        # 删除旧文件
+        rm -f e.xml e.xml.gz
+        
+        # 定义EPG源列表（按优先级排序，可自行增减）
+        EPG_SOURCES=(
+          "https://epg.112114.xyz/pp.xml"
+          "http://e.erw.cc/all.xml"
+          "https://epg.zsdc.eu.org/t.xml"
+          "http://epg.51zmt.top:8000/e1.xml"
+        )
 
-      # 2. 创建logo目录
-      - name: 创建logo目录
-        run: mkdir -p logo
-
-      # 3. 同步的多仓库列表 + 循环下载PNG
-      - name: 循环同步多仓库PNG文件
-        run: |
-          # ========== 核心配置：添加/删除仓库只需修改这里 ==========
-          # 格式："仓库API地址|自定义标识"（标识用于日志区分）
-          REPOS=(
-            "https://api.github.com/repos/fanmingming/live/contents/tv|fanmingming-live"
-            "https://api.github.com/repos/sparkssssssssss/epg/contents/logo|sparkssssssssss-epg"
-          )
-
-          # ========== 循环处理每个仓库 ==========
-          for REPO in "${REPOS[@]}"; do
-            # 拆分仓库API地址和标识（兼容只有地址的情况，避免空值）
-            ROOT_API_URL=$(echo "$REPO" | cut -d'|' -f1)
-            REPO_TAG=$(echo "$REPO" | cut -d'|' -f2)
-            # 兜底：如果没写标识，用API地址最后一段作为标识
-            if [ -z "$REPO_TAG" ]; then
-              REPO_TAG=$(basename "$ROOT_API_URL")
-            fi
-            
-            echo -e "\n=================================================="
-            echo "开始处理仓库：$REPO_TAG（根目录：$ROOT_API_URL）"
-            echo "=================================================="
-
-            # ========== 递归遍历当前仓库的所有目录 ==========
-            DIRS_TO_PROCESS=("$ROOT_API_URL")  # 待处理目录队列
-            PROCESSED_DIRS=()                  # 已处理目录（防重复）
-
-            while [ ${#DIRS_TO_PROCESS[@]} -gt 0 ]; do
-              # 取出队列第一个目录
-              CURRENT_DIR=${DIRS_TO_PROCESS[0]}
-              DIRS_TO_PROCESS=("${DIRS_TO_PROCESS[@]:1}")  # 移除第一个元素
-
-              # 跳过已处理的目录
-              if [[ " ${PROCESSED_DIRS[@]} " =~ " ${CURRENT_DIR} " ]]; then
-                continue
-              fi
-              PROCESSED_DIRS+=("$CURRENT_DIR")
-              echo -e "\n→ 处理子目录：$CURRENT_DIR"
-
-              # 获取当前目录下的所有内容（文件+子目录）
-              # 可选：添加Token解决API频率限制（取消注释并配置秘钥）
-              # RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN_CUSTOM }}" "$CURRENT_DIR")
-              RESPONSE=$(curl -s "$CURRENT_DIR")
-
-              # 遍历当前目录的每个项（Base64解码防乱码）
-              echo "$RESPONSE" | jq -r '.[] | @base64' | while read -r ITEM; do
-                DECODED_ITEM=$(echo "$ITEM" | base64 --decode)
-                ITEM_TYPE=$(echo "$DECODED_ITEM" | jq -r '.type')
-                ITEM_NAME=$(echo "$DECODED_ITEM" | jq -r '.name')
-                ITEM_DOWNLOAD_URL=$(echo "$DECODED_ITEM" | jq -r '.download_url')
-                ITEM_URL=$(echo "$DECODED_ITEM" | jq -r '.url')
-
-                # 1. 如果是子目录，加入待处理队列
-                if [ "$ITEM_TYPE" == "dir" ] && [ "$ITEM_URL" != "null" ]; then
-                  echo "  ✅ 发现子目录：$ITEM_NAME → 加入遍历队列"
-                  DIRS_TO_PROCESS+=("$ITEM_URL")
-                
-                # 2. 如果是PNG文件，下载（已存在则跳过，防覆盖）
-                elif [ "$ITEM_TYPE" == "file" ] && [ "$ITEM_NAME" != "null" ] && [[ "$ITEM_NAME" =~ \.png$ ]]; then
-                  if [ "$ITEM_DOWNLOAD_URL" != "null" ]; then
-                    FILENAME=$(basename "$ITEM_NAME")
-                    # 关键：判断文件是否已存在（高优先级仓库先下，低优先级跳过）
-                    if [ -f "logo/$FILENAME" ]; then
-                      echo "  ⚠️ $FILENAME 已存在（高优先级版本）→ 跳过"
-                    else
-                      echo "  📥 下载：$FILENAME"
-                      curl -s -o "logo/$FILENAME" "$ITEM_DOWNLOAD_URL" || echo "  ❌ $FILENAME 下载失败"
-                    fi
-                  fi
-                fi
-              done
-            done
-            
-            # 单个仓库处理完成日
-            echo -e "\n✅ 仓库 $REPO_TAG 递归遍历完成"
-            echo -e "=================================================="
-            echo "仓库 $REPO_TAG 处理完成"
-            echo "=================================================="
-          done  # 多仓库循环结束
-
-      # 4. 提交并推送同步后的文件到自己的仓库
-      - name: 提交并推送变更
-        run: |
-          # 配置git用户信息
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+        # 循环尝试下载，强制忽略wget报错，继续执行
+        DOWNLOAD_SUCCESS=0
+        for SOURCE in "${EPG_SOURCES[@]}"; do
+          echo "尝试下载EPG源: $SOURCE"
+          wget -q -T 20 -O e.xml "$SOURCE" -t 2 || true
           
-          # 检查logo目录是否有文件变更
-          if git status --porcelain | grep -q "logo/"; then
-            git add logo/*
-            git commit -m "Logo Update: $(date +'%Y-%m-%d')"
-            git push
-            echo "✅ 所有仓库PNG文件同步完成！"
+          # 检查文件是否存在且非空（核心判断，替代wget返回值）
+          if [ -f e.xml ] && [ -s e.xml ]; then
+            echo "成功下载EPG源: $SOURCE"
+            DOWNLOAD_SUCCESS=1
+            break
           else
-            echo "ℹ️ 没有新的PNG文件需要同步"
+            echo "EPG源 $SOURCE 下载失败或文件为空，尝试下一个源"
+            rm -f e.xml  # 删除失败的文件
           fi
+        done
+        
+        # 所有源都失败时终止任务
+        if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
+          echo "❌ 所有EPG源下载失败，任务终止"
+          exit 1
+        fi
+        
+        # 压缩文件
+        gzip -c e.xml > e.xml.gz
+        
+        # 配置git用户信息
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # 添加文件到暂存区
+        git add e.xml e.xml.gz
+        
+        # 检查是否有变更，无变更则跳过提交
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+          exit 0
+        fi
+        
+        # 提交更新
+        git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
+    
+    - name: Push changes
+      run: |
+        git pull --rebase origin main || true
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
