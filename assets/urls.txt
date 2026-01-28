@@ -76,7 +76,6 @@ https://iptv-org.github.io/iptv/languages/zho.m3u
 https://iptv-org.github.io/iptv/countries/us.m3u
 https://iptv-org.github.io/iptv/countries/tw.m3u
 https://cc-im-kefu-cos.7moor-fs2.com/im/2768a390-5474-11ea-afc9-7b323e3e16c0/d4fe44c5-107c-4511-af02-aa08fb10dff7/2024-04-25/2024-04-25_17:22:21/1714036941087/98644330/wexiptv.txt
-https://fs-im-kefu.7moor-fs1.com/ly/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/1716213337323/live3.txt
 https://fm1077.serv00.net/SmartTV.m3u
 https://live.zbds.top/tv/iptv4.txt
 https://live.zbds.top/tv/iptv6.txt
