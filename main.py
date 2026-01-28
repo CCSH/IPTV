@@ -23,7 +23,7 @@ def read_txt_to_array(file_name):
         print(f"An error occurred: {e}")
         return []
 
-#read BlackList 2024-06-17 15:02
+#读取 BlackList
 def read_blacklist_from_txt(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
@@ -204,7 +204,7 @@ def convert_m3u_to_txt(m3u_content):
     # 将结果合并成一个字符串，以换行符分隔
     return '\n'.join(txt_lines)
 
-# 在list是否已经存在url 2024-07-22 11:18
+# 在list是否已经存在url
 def check_url_existence(data_list, url):
     """
     Check if a given URL exists in a list of data.
@@ -219,7 +219,7 @@ def check_url_existence(data_list, url):
     urls = [item.split(',')[1] for item in data_list]
     return url not in urls #如果不存在则返回true，需要
 
-# 处理带$的URL，把$之后的内容都去掉（包括$也去掉） 【2024-08-08 22:29:11】
+# 处理带$的URL，把$之后的内容都去掉（包括$也去掉）
 def clean_url(url):
     last_dollar_index = url.rfind('$')  # 安全起见找最后一个$处理
     if last_dollar_index != -1:
@@ -437,7 +437,7 @@ def process_channel_line(line):
 def process_url(url):
     print(f"处理URL: {url}")
     try:
-        other_lines.append(url+",#genre#")  # 存入other_lines便于check 2024-08-02 10:41
+        other_lines.append(url+",#genre#")  # 存入other_lines便于check
         
         # 创建一个请求对象并添加自定义header
         headers = {
@@ -623,7 +623,7 @@ except Exception as e:
 
 def make_m3u(txt_file, m3u_file):
     try:
-        output_text = '#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml.gz"\n'
+        output_text = '#EXTM3U x-tvg-url="https://github.com/CCSH/IPTV/raw/refs/heads/main/e.xml.gz"\n'
         with open(txt_file, "r", encoding='utf-8') as file:
             input_text = file.read()
 
@@ -673,7 +673,4 @@ print(f"blacklist行数: {combined_blacklist_hj} ")
 print(f"live.txt行数: {all_lines_hj} ")
 print(f"others.txt行数: {other_lines_hj} ")
 
-#备用1：http://tonkiang.us
-#备用2：https://www.zoomeye.hk,https://www.shodan.io,https://tv.cctv.com/live/
-#备用3：(BlackList检测对象)http,rtmp,p3p,rtp（rtsp，p2p）
 
