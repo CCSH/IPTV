@@ -9,10 +9,10 @@
 ### 直播源 (Live Channels)
 支持 TXT 和 M3U 两种格式，提供完整版、精简版及特色频道版本。
 
-| 格式 | 完整版（全频道） | 精简版（主流频道） | 特色频道版 |
+| 格式 | 完整版（含地方台） | 精简版（不含地方台） | 直播平台（虎牙、斗鱼、B站、YY） ｜ 剩余其他频道 |
 | :--- | :--- | :--- | :--- |
-| **TXT** | [live.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.txt) | [live_lite.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.txt) | [other.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/others.txt) |
-| **M3U** | [live.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u) | [live_lite.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.m3u) | — |
+| **TXT** | [live.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.txt) | [live_lite.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.txt) | — | [other.txt](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/others.txt) |
+| **M3U** | [live.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u) | [live_lite.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_lite.m3u) | [live_platforms.m3u](https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live_platforms.m3u) | — |
 
 ### EPG 电子节目指南
 提供原始 XML 和压缩 GZ 双版本，压缩版体积更小，适合网络调用。
@@ -47,6 +47,7 @@ https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo/{频道名}.png
 | **黑白名单** | 每周四 00:00 更新一次 ✅ | 测速现有直播源，自动检测并剔除失效源 |
 | **EPG 节目单** | 每日 00:30 开始，每 4 小时更新一次 ✅ | 高频更新，确保节目信息准确及时 |
 | **台标 LOGO** | 每日 08:00 更新一次 ✅ | 同步新增频道台标，修复失效链接，补充高清图标 |
+| **直播平台** | 每日 00:00 开始，每 2 小时更新一次 ✅ | 直播平台（虎牙、斗鱼、B站、YY）轮播整理收集合并 |
 
 ---
 
