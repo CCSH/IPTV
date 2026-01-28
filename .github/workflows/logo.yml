@@ -1,0 +1,65 @@
+name: Logo Update
+
+on:
+  workflow_dispatch:  # 手动触发
+  schedule:
+    - cron: '0 0 * * *'  # 每天北京时间8点自动同步（可选）
+
+jobs:
+  sync-multi-repos:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出自己的仓库
+      - name: 检出本仓库
+        uses: actions/checkout@v4
+
+      # 2. 创建logo目录
+      - name: 创建logo目录
+        run: mkdir -p logo
+
+      # 3. 定义要同步的多仓库列表 + 循环下载PNG
+      - name: 循环同步多仓库PNG文件
+        run: |
+          # ========== 核心配置：添加/删除仓库只需修改这里 ==========
+          # 格式："仓库API地址|自定义标识"（标识用于日志区分）
+          REPOS=(
+            "https://api.github.com/repos/fanmingming/live/contents/tv"
+            "https://api.github.com/repos/sparkssssssssss/epg/contents/logo"
+          )
+
+          # 循环处理每个仓库
+          for REPO in "${REPOS[@]}"; do
+            # 拆分仓库API地址和自定义标识
+            API_URL=$(echo "$REPO" | cut -d'|' -f1)
+            REPO_NAME=$(echo "$REPO" | cut -d'|' -f2)
+            
+            echo -e "\n===== 开始同步：$REPO_NAME ====="
+            
+            # 获取该仓库目录下的所有PNG文件下载链接
+            RESPONSE=$(curl -s "$API_URL")
+            # 过滤PNG链接并批量下载
+            echo "$RESPONSE" | jq -r '.[] | select(.name | endswith(".png")) | .download_url' | while read -r URL; do
+              if [ -n "$URL" ]; then  # 跳过空链接
+                FILENAME=$(basename "$URL")
+                echo "下载 $REPO_NAME：$FILENAME"
+                curl -s -o "logo/$FILENAME" "$URL" || echo "⚠️ $FILENAME 下载失败，跳过"
+              fi
+            done
+          done
+
+      # 4. 提交并推送同步后的文件到自己的仓库
+      - name: 提交并推送变更
+        run: |
+          # 配置git用户信息
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 检查logo目录是否有文件变更
+          if git status --porcelain | grep -q "logo/"; then
+            git add logo/*
+            git commit -m "Logo Update: $(date +'%Y-%m-%d')"
+            git push
+            echo "✅ 所有仓库PNG文件同步完成！"
+          else
+            echo "ℹ️ 没有新的PNG文件需要同步"
+          fi
