@@ -47,13 +47,7 @@ jobs:
             download "$url" "$fn"
           done
 
-          # 2. 专属处理：yylunbo.m3u 域名替换（sub → yylunbo）
-          if [ -s "yylunbo.m3u" ]; then
-            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' "yylunbo.m3u"
-            echo "🔧 已替换yylunbo.m3u域名：sub.ottiptv.cc → yylunbo.ottiptv.cc"
-          fi
-
-          # 3. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
+          # 2. 合并所有M3U为单个文件（标准格式+成对去重+过滤空行）
           echo "🔗 开始合并为 ${MERGED_M3U}"
           echo "#EXTM3U" > $MERGED_M3U # M3U播放器标准头
           tmp=$(mktemp)
@@ -61,11 +55,11 @@ jobs:
           awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' $tmp >> $MERGED_M3U
           rm -f $tmp
 
-          # 4. 关键修复：删除4个源M3U，仅保留合并后的最终合集
+          # 3. 关键修复：删除4个源M3U，仅保留合并后的最终合集
           rm -f huyayqk.m3u douyuyqk.m3u bililive.m3u yylunbo.m3u
           echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
 
-          # 5. Git配置+有变更才提交
+          # 4. Git配置+有变更才提交
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           if git diff --quiet -- *.m3u; then
