@@ -23,7 +23,11 @@ jobs:
           pip install opencc-python-reimplemented
 
       - name: Run Python script
-        run: python main.py
+        run: |
+          # 删除旧文件，不存在则忽略，避免内容残留
+          rm -f live.txt live.m3u live_lite.txt live_lite.m3u others.txt
+          # 执行Python脚本生成新文件
+          python main.py
 
       - name: Commit changes
         run: |
