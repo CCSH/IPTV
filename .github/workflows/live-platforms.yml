@@ -52,7 +52,7 @@ jobs:
             download "$url" "$fn"
           done
 
-          # YY轮播相关逻辑，全部注释
+          # YY轮播相关逻辑
           if [ -s "yylunbo.m3u" ]; then
             sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
             echo "🔧 YY轮播域名替换完成：sub → yylunbo"
