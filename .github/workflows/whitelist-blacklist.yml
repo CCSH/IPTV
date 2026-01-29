@@ -23,7 +23,11 @@ jobs:
           pip install opencc-python-reimplemented
 
       - name: Run Python script
-        run: python assets/whitelist-blacklist/main.py
+        run: |
+          # 删除子目录下的旧文件，不存在不报错，避免内容残留
+          rm -f ./assets/whitelist-blacklist/*
+          # 执行子目录下的Python脚本生成新文件
+          python assets/whitelist-blacklist/main.py
 
       - name: Commit changes
         run: |
