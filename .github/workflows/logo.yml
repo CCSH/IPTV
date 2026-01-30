@@ -3,32 +3,26 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
-
 jobs:
   sync-by-clone:
     runs-on: ubuntu-latest
     steps:
       - name: 检出自己的仓库
         uses: actions/checkout@v4
-
       - name: 创建logo目录
         run: mkdir -p logo
-
       - name: 克隆目标仓库+筛选所有PNG
         run: |
           REPOS=(
             "https://github.com/fanmingming/live.git|tv|fanmingming-live"
             "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
           )
-
           for REPO in "${REPOS[@]}"; do
             REPO_URL=$(echo "$REPO" | cut -d'|' -f1)
             TARGET_DIR=$(echo "$REPO" | cut -d'|' -f2)
             REPO_TAG=$(echo "$REPO" | cut -d'|' -f3)
-            
             echo -e "\n===== 处理仓库：$REPO_TAG ====="
             git clone --depth 1 "$REPO_URL" "temp_$REPO_TAG" || echo "⚠️ 仓库克隆失败，跳过"
-            
             find "temp_$REPO_TAG/$TARGET_DIR" -name "*.png" -type f | while read -r PNG_FILE; do
               [ -z "$PNG_FILE" ] && continue
               FILENAME=$(basename "$PNG_FILE")
@@ -47,23 +41,24 @@ jobs:
                 fi
               fi
             done
-            
             rm -rf "temp_$REPO_TAG"
           done
-
           find logo/ -name ".png" -delete
           find logo/ -type f -name "*.png" -size 0 -delete
-
-      - name: 提交推送
+      - name: 配置Git并暂存文件
         run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
-          git pull --rebase origin main || true
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add logo/*.png 2>/dev/null
+      - name: 提交并推送变更
+        run: |
           if git diff --cached --quiet; then
-            echo "ℹ️ 无新的有效PNG文件需要同步"
+            echo "ℹ️ 无新的有效PNG文件需要同步，跳过提交推送"
           else
-            git commit -m "Logo Update: $(date +'%Y-%m-%d')"
-            git push -u origin main
-            echo "✅ 同步完成！"
+            git pull --rebase origin main || true
+            git commit -m "Logo Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
+            git push origin main
+            echo "✅ Logo文件同步并推送完成"
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
