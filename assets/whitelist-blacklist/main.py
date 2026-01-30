@@ -156,7 +156,8 @@ def convert_m3u_to_txt(m3u_content):
 
 def process_url(url):
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        encoded_url = quote(unquote(url), safe=':/?&=')
+        req = urllib.request.Request(encoded_url, headers={"User-Agent": USER_AGENT})
         with urllib.request.urlopen(req, timeout=TIMEOUT_FETCH) as resp:
             text = resp.read().decode('utf-8', errors='replace')
             if is_m3u_content(text):
