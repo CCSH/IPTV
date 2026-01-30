@@ -4,11 +4,10 @@ import re
 import os
 from datetime import datetime, timedelta, timezone
 import opencc
-from pypinyin import lazy_pinyin
 
 # ===================== 全局核心配置 =====================
-# 指定按TXT文件内顺序排列的分类，其余自动拼音排序，按需增删
-ORDERED_CHANNEL_TYPES = ["央视频道", "卫视频道"]
+# 指定按TXT文件内顺序排列的分类，其余自动字典序排序，按需增删
+ORDERED_CHANNEL_TYPES = ["央视频道", "卫视频道", "港澳台", "电影频道", "电视剧频道", "综艺频道", "NewTV"]
 # 频道名称清理字符集
 REMOVAL_LIST = [
     "「IPV4」", "「IPV6」", "[ipv6]", "[ipv4]", "_电信", "电信", "（HD）", "[超清]",
@@ -310,11 +309,11 @@ def sort_channel_data(channel_data: list, chn_type: str, cfg_list: list) -> list
             return len(cfg_list)
         return sorted(channel_data, key=_ordered_key, stable=True)
     else:
-        def _pinyin_key(line):
+        def _dict_key(line):
             name = line.split(',')[0] if ',' in line else ""
             pure_name = re.sub(r'[^\w\u4e00-\u9fff]', '', name)
-            return ''.join(lazy_pinyin(pure_name if pure_name else name))
-        return sorted(channel_data, key=_pinyin_key)
+            return pure_name if pure_name else name
+        return sorted(channel_data, key=_dict_key)
 
 def generate_live_text(classifier: ChannelClassifier, main_dict: dict, lite_sort: list) -> tuple[list, list]:
     bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
