@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 初始化logo目录
         run: mkdir -p "$LOGO_DIR" && chmod 755 "$LOGO_DIR"
