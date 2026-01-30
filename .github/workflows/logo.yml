@@ -2,7 +2,7 @@ name: Logo Update
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * 5'  
 jobs:
   sync-by-clone:
     runs-on: ubuntu-latest
