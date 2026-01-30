@@ -7,7 +7,7 @@ import opencc
 
 # ===================== 全局核心配置 =====================
 # 指定按TXT文件内顺序排列的分类，其余自动字典序排序，按需增删
-ORDERED_CHANNEL_TYPES = ["央视频道", "卫视频道", "港澳台", "电影频道", "电视剧频道", "综艺频道", "NewTV"]
+ORDERED_CHANNEL_TYPES = ["央视频道", "卫视频道", "港澳台", "电影频道", "电视剧频道", "综艺频道", "埋堆堆"]
 # 频道名称清理字符集
 REMOVAL_LIST = [
     "「IPV4」", "「IPV6」", "[ipv6]", "[ipv4]", "_电信", "电信", "（HD）", "[超清]",
@@ -468,3 +468,4 @@ if __name__ == "__main__":
     print(f"[STAT] others.txt行数: {others_count}")
     print(f"[STAT] 全局单频道最大源数量限制: {SINGLE_CHANNEL_MAX_COUNT}个")
     print("=" * 60)
+
