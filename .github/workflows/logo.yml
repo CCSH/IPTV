@@ -16,39 +16,29 @@ jobs:
 
       - name: 克隆目标仓库+筛选所有PNG
         run: |
-          # ========== 配置要克隆的仓库列表 ==========
           REPOS=(
             "https://github.com/fanmingming/live.git|tv|fanmingming-live"
             "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
           )
 
-          # 循环克隆每个仓库并复制PNG
           for REPO in "${REPOS[@]}"; do
             REPO_URL=$(echo "$REPO" | cut -d'|' -f1)
             TARGET_DIR=$(echo "$REPO" | cut -d'|' -f2)
             REPO_TAG=$(echo "$REPO" | cut -d'|' -f3)
             
             echo -e "\n===== 处理仓库：$REPO_TAG ====="
-            # 克隆仓库（浅克隆，速度快）
             git clone --depth 1 "$REPO_URL" "temp_$REPO_TAG" || echo "⚠️ 仓库克隆失败，跳过"
             
-            # 递归查找所有PNG文件，新增3层过滤：
-            # 1. 过滤空路径 2. 过滤空文件名 3. 过滤仅后缀的文件（如.png）
             find "temp_$REPO_TAG/$TARGET_DIR" -name "*.png" -type f | while read -r PNG_FILE; do
-              # 过滤空路径
               [ -z "$PNG_FILE" ] && continue
-              # 提取文件名
               FILENAME=$(basename "$PNG_FILE")
-              # 过滤空文件名/仅后缀的文件
               if [ -z "$FILENAME" ] || [ "$FILENAME" == ".png" ] || [[ ! "$FILENAME" =~ ^.+?\.png$ ]]; then
                 echo "⚠️ 无效文件名：$FILENAME → 跳过"
                 continue
               fi
-              # 正常文件：已存在则跳过，否则复制
               if [ -f "logo/$FILENAME" ]; then
                 echo "⚠️ $FILENAME 已存在，跳过"
               else
-                # 复制前检查文件是否为空，避免空文件
                 if [ -s "$PNG_FILE" ]; then
                   cp "$PNG_FILE" logo/
                   echo "✅ 复制：$FILENAME"
@@ -58,23 +48,18 @@ jobs:
               fi
             done
             
-            # 删除临时仓库
             rm -rf "temp_$REPO_TAG"
           done
 
-          # 兜底：清理logo目录下的空文件/无效命名文件
           find logo/ -name ".png" -delete
           find logo/ -type f -name "*.png" -size 0 -delete
 
       - name: 提交推送
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          # 先拉取最新代码，避免冲突
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
           git pull --rebase origin main || true
-          # 只添加有效PNG文件
           git add logo/*.png 2>/dev/null
-          # 检查是否有实际变更
           if git diff --cached --quiet; then
             echo "ℹ️ 无新的有效PNG文件需要同步"
           else
