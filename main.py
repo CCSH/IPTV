@@ -37,7 +37,7 @@ def get_project_dirs() -> dict:
         "blacklist_manual": os.path.join(root_dir, "assets/whitelist-blacklist/blacklist_manual.txt"),
         "whitelist_manual": os.path.join(root_dir, "assets/whitelist-blacklist/whitelist_manual.txt"),
         "whitelist_auto": os.path.join(root_dir, "assets/whitelist-blacklist/whitelist_auto.txt"),
-        "blackhost_count": os.path.join(root_dir, "blackhost_count.txt"),
+        "blackhost_count": os.path.join(root_dir, "assets/whitelist-blacklist/blackhost_count.txt"),
         "corrections_name": os.path.join(root_dir, "assets/corrections_name.txt"),
         "urls": os.path.join(root_dir, "assets/urls.txt"),
         "main_channel": os.path.join(root_dir, "主频道"),
@@ -508,3 +508,4 @@ if __name__ == "__main__":
     print(f"[STAT] live.txt行数: {live_count}")
     print(f"[STAT] others.txt行数: {others_count}")
     print("=" * 60)
+
