@@ -56,8 +56,7 @@ jobs:
       - name: 提交并推送
         run: |
           if git diff --cached --name-only | grep -q .; then
-            COMMIT_MSG="黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
-            git commit -m "$COMMIT_MSG"
+            git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
             git pull origin $GITHUB_REF_NAME --rebase --autostash --quiet
             git push origin HEAD:$GITHUB_REF_NAME --quiet
             echo "✅ 推送完成"
