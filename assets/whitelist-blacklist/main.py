@@ -79,7 +79,7 @@ def get_file_dirs() -> Dict[str, str]:
         "current": current_dir,
         "parent2": parent2_dir,
         # 输入文件
-        "urls": os.path.join(current_dir, 'assets/urls.txt'),
+        "urls": os.path.join(parent2_dir, 'urls.txt'),
         "live": os.path.join(parent2_dir, 'live.txt'),
         "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
         "others": os.path.join(parent2_dir, 'others.txt'),
