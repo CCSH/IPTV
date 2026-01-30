@@ -269,8 +269,7 @@ def get_file_paths():
         "others": os.path.join(parent2_dir, 'others.txt'),
         "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
         "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
-        "whitelist_auto_tv": os.path.join(current_dir, 'whitelist_auto_tv.txt'),
-        "blackhost_count": os.path.join(current_dir, "blackhost_count.txt")
+        "whitelist_auto_tv": os.path.join(current_dir, 'whitelist_auto_tv.txt')
     }
 
 if __name__ == "__main__":
@@ -326,15 +325,6 @@ if __name__ == "__main__":
     write_list(file_paths["whitelist_auto"], success_output)
     write_list(file_paths["whitelist_auto_tv"], success_tv_output)
     write_list(file_paths["blacklist_auto"], black_output)
-
-    if blacklist_dict:
-        sorted_hosts = sorted(blacklist_dict.items(), key=lambda x: x[1], reverse=True)
-        with open(file_paths["blackhost_count"], 'w', encoding='utf-8') as f:
-            for host, count in sorted_hosts:
-                f.write(f"{host}: {count}\n")
-        print(f"Blackhost count saved: {file_paths['blackhost_count']}")
-    else:
-        print("No blackhost records")
 
     end_time = datetime.now()
     elapsed = end_time - timestart
