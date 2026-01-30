@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import urlparse, quote
+from urllib.parse import urlparse, quote, unquote
 import socket
 import subprocess
 
@@ -114,7 +114,7 @@ def check_rtp_url(url, timeout):
 def check_url(url, timeout=TIMEOUT_CHECK):
     start_time = time.time()
     try:
-        encoded_url = quote(url, safe=':/?&=')
+        encoded_url = quote(unquote(url), safe=':/?&=')
         if url.startswith("http"):
             req = urllib.request.Request(encoded_url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -158,7 +158,7 @@ def process_url(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         with urllib.request.urlopen(req, timeout=TIMEOUT_FETCH) as resp:
-            text = resp.read().decode('utf-8', errors='ignore')
+            text = resp.read().decode('utf-8', errors='replace')
             if is_m3u_content(text):
                 m3u_lines = convert_m3u_to_txt(text)
                 url_statistics.append(f"{len(m3u_lines)},{url.strip()}")
