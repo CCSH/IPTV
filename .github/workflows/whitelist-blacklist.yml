@@ -52,17 +52,18 @@ jobs:
         run: git add --force assets/whitelist-blacklist/*.txt
         continue-on-error: true
         id: stage-files
-
+  
       - name: 提交并推送
         run: |
           if git diff --cached --name-only | grep -q .; then
             git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
-            git pull origin $GITHUB_REF_NAME --rebase --autostash --quiet
-            git push origin HEAD:$GITHUB_REF_NAME --quiet
+            # 直接安全强制推送，无任何拉取/合并步骤，从根源避冲突
+            git push origin HEAD:$GITHUB_REF_NAME --force-with-lease --quiet
             echo "✅ 推送完成"
           else
             echo "ℹ️ 无变更，跳过"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  if: steps.stage-files.outcome == 'success'
         if: steps.stage-files.outcome == 'success'
