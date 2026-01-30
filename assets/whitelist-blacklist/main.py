@@ -3,98 +3,65 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import quote, unquote, urlparse
+from urllib.parse import urlparse, quote
 import socket
 import subprocess
-from typing import List, Tuple, Dict, Optional
 
-TIMEOUT_URL_CHECK = 3
-TIMEOUT_URL_FETCH = 5
-MAX_WORKERS = 50
+timestart = datetime.now()
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
-SKIP_STRINGS = ['#genre#', '#EXTINF:-1', '"ext"']
-REQUIRED_STRINGS = ['://']
-socket.setdefaulttimeout(5)
+TIMEOUT_CHECK = 5
+TIMEOUT_FETCH = 10
+MAX_WORKERS = 30
+blacklist_dict = {}
+urls_all_lines = []
+url_statistics = []
 
-blacklist_host_dict: Dict[str, int] = {}
-
-def read_txt_to_array(file_name: str) -> List[str]:
+def read_txt_to_array(file_name):
     try:
-        with open(file_name, 'r', encoding='utf-8') as f:
-            return [line.strip() for line in f.readlines() if line.strip()]
+        with open(file_name, 'r', encoding='utf-8') as file:
+            return [line.strip() for line in file.readlines() if line.strip()]
     except FileNotFoundError:
-        print(f"[ERROR] 文件未找到: {file_name}")
+        print(f"File '{file_name}' not found.")
         return []
     except Exception as e:
-        print(f"[ERROR] 读取文件 {file_name} 失败: {str(e)}")
+        print(f"An error occurred: {e}")
         return []
 
-def read_txt_file(file_path: str) -> List[str]:
+def read_txt_file(file_path):
+    skip_strings = ['#genre#', '#EXTINF:-1', '"ext"']
+    required_strings = ['://']
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return [
-                line.strip() for line in f
-                if line.strip() and not any(s in line for s in SKIP_STRINGS)
-                and all(r in line for r in REQUIRED_STRINGS)
+                line.strip() for line in file
+                if not any(skip_str in line for skip_str in skip_strings)
+                and all(req_str in line for req_str in required_strings)
             ]
     except Exception as e:
-        print(f"[ERROR] 过滤读取文件 {file_path} 失败: {str(e)}")
+        print(f"Read file error {file_path}: {e}")
         return []
-
-def write_list(file_path: str, data_list: List[str]) -> None:
-    try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(data_list))
-        print(f"[SUCCESS] 文件已生成: {file_path}")
-    except Exception as e:
-        print(f"[ERROR] 写入文件 {file_path} 失败: {str(e)}")
 
 def get_host_from_url(url: str) -> str:
     try:
-        parsed = urlparse(url)
-        return parsed.netloc if parsed.netloc else ""
+        return urlparse(url).netloc or ""
     except Exception:
         return ""
 
-def safe_quote_url(url: str) -> str:
-    try:
-        unquoted = unquote(url)
-        return quote(unquoted, safe=':/?&=')
-    except Exception:
-        return url
-
-def get_file_dirs() -> Dict[str, str]:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    parent2_dir = os.path.dirname(parent_dir)
-    return {
-        "current": current_dir,
-        "parent2": parent2_dir,
-        "urls": os.path.join(parent_dir, 'urls.txt'),
-        "live": os.path.join(parent2_dir, 'live.txt'),
-        "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
-        "others": os.path.join(parent2_dir, 'others.txt'),
-        "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
-        "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
-        "whitelist_auto_tv": os.path.join(current_dir, 'whitelist_auto_tv.txt'),
-        "blackhost_count": os.path.join(current_dir, "blackhost_count.txt")
-    }
-
-def record_black_host(host: str) -> None:
+def record_host(host):
     if not host:
         return
-    blacklist_host_dict[host] = blacklist_host_dict.get(host, 0) + 1
+    blacklist_dict[host] = blacklist_dict.get(host, 0) + 1
 
-def check_p3p_url(url: str, timeout: int) -> bool:
+def check_p3p_url(url, timeout):
     try:
         parsed = urlparse(url)
         host, port = parsed.hostname, parsed.port or 80
+        path = parsed.path or "/"
         if not host or not port:
             return False
         with socket.create_connection((host, port), timeout=timeout) as s:
             request = (
-                f"GET {parsed.path or '/'} P3P/1.0\r\n"
+                f"GET {path} P3P/1.0\r\n"
                 f"Host: {host}\r\n"
                 f"User-Agent: {USER_AGENT}\r\n"
                 f"Connection: close\r\n\r\n"
@@ -104,32 +71,32 @@ def check_p3p_url(url: str, timeout: int) -> bool:
     except Exception:
         return False
 
-def check_p2p_url(url: str, timeout: int) -> bool:
+def check_p2p_url(url, timeout):
     try:
         parsed = urlparse(url)
-        host, port = parsed.hostname, parsed.port
-        if not host or not port or not parsed.path:
+        host, port, path = parsed.hostname, parsed.port, parsed.path
+        if not host or not port or not path:
             return False
         with socket.create_connection((host, port), timeout=timeout) as s:
-            request = f"YOUR_CUSTOM_REQUEST {parsed.path}\r\nHost: {host}\r\n\r\n"
+            request = f"YOUR_CUSTOM_REQUEST {path}\r\nHost: {host}\r\n\r\n"
             s.sendall(request.encode())
             return b"SOME_EXPECTED_RESPONSE" in s.recv(1024)
     except Exception:
         return False
 
-def check_rtmp_url(url: str, timeout: int) -> bool:
+def check_rtmp_url(url, timeout):
     try:
-        result = subprocess.run(
-            ['ffprobe', '-v', 'quiet', '-timeout', f'{timeout * 1000000}', url],
+        subprocess.run(
+            ['ffprobe', '-v', 'quiet', url],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             timeout=timeout
         )
-        return result.returncode == 0
+        return True
     except Exception:
         return False
 
-def check_rtp_url(url: str, timeout: int) -> bool:
+def check_rtp_url(url, timeout):
     try:
         parsed = urlparse(url)
         host, port = parsed.hostname, parsed.port
@@ -144,224 +111,242 @@ def check_rtp_url(url: str, timeout: int) -> bool:
     except Exception:
         return False
 
-def check_url(url: str, timeout: int = TIMEOUT_URL_CHECK) -> Tuple[Optional[float], bool]:
+def check_url(url, timeout=TIMEOUT_CHECK):
     start_time = time.time()
     try:
-        encoded_url = safe_quote_url(url)
+        encoded_url = quote(url, safe=':/?&=')
         if url.startswith("http"):
             req = urllib.request.Request(encoded_url, headers={"User-Agent": USER_AGENT})
-            req.set_timeout(timeout)
-            with urllib.request.urlopen(req) as resp:
-                success = resp.status == 200
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                if resp.status != 200:
+                    raise Exception("Status not 200")
         elif url.startswith("p3p"):
-            success = check_p3p_url(encoded_url, timeout)
+            if not check_p3p_url(encoded_url, timeout):
+                raise Exception("P3P check failed")
         elif url.startswith("p2p"):
-            success = check_p2p_url(encoded_url, timeout)
+            if not check_p2p_url(encoded_url, timeout):
+                raise Exception("P2P check failed")
         elif url.startswith(("rtmp", "rtsp")):
-            success = check_rtmp_url(encoded_url, timeout)
+            if not check_rtmp_url(encoded_url, timeout):
+                raise Exception("RTMP/RTSP check failed")
         elif url.startswith("rtp"):
-            success = check_rtp_url(encoded_url, timeout)
+            if not check_rtp_url(encoded_url, timeout):
+                raise Exception("RTP check failed")
         else:
-            success = False
-
-        elapsed = (time.time() - start_time) * 1000 if success else None
-        return elapsed, success
+            raise Exception("Unsupported scheme")
+        
+        elapsed = (time.time() - start_time) * 1000
+        return elapsed, True
     except Exception:
-        record_black_host(get_host_from_url(url))
+        record_host(get_host_from_url(url))
         return None, False
 
-def is_m3u_content(text: str) -> bool:
+def is_m3u_content(text):
     return text.strip().startswith("#EXTM3U") if text else False
 
-def convert_m3u_to_txt(m3u_content: str) -> List[str]:
+def convert_m3u_to_txt(m3u_content):
     lines = [line.strip() for line in m3u_content.split('\n') if line.strip()]
     txt_lines, channel_name = [], ""
     for line in lines:
         if line.startswith("#EXTINF"):
             channel_name = line.split(',')[-1].strip()
-        elif line.startswith(("http", "rtmp", "rtsp", "p3p", "p2p", "rtp")):
-            if channel_name:
-                txt_lines.append(f"{channel_name},{line}")
+        elif line.startswith(("http", "rtmp", "rtsp", "p3p", "p2p", "rtp")) and channel_name:
+            txt_lines.append(f"{channel_name},{line}")
     return txt_lines
 
-def process_remote_url(url: str) -> List[str]:
+def process_url(url):
     try:
-        req = urllib.request.Request(safe_quote_url(url), headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=TIMEOUT_URL_FETCH) as resp:
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        with urllib.request.urlopen(req, timeout=TIMEOUT_FETCH) as resp:
             text = resp.read().decode('utf-8', errors='ignore')
             if is_m3u_content(text):
-                return convert_m3u_to_txt(text)
+                m3u_lines = convert_m3u_to_txt(text)
+                url_statistics.append(f"{len(m3u_lines)},{url.strip()}")
+                urls_all_lines.extend(m3u_lines)
             else:
-                return [
+                valid_lines = [
                     line.strip() for line in text.split('\n')
                     if line.strip() and "#genre#" not in line and "," in line and "://" in line
                 ]
+                url_statistics.append(f"{len(valid_lines)},{url.strip()}")
+                urls_all_lines.extend(valid_lines)
     except Exception as e:
-        print(f"[ERROR] 拉取远程源失败 {url}: {str(e)}")
-        return []
+        print(f"Process URL error {url}: {e}")
 
-def clean_url_dollar(lines: List[str]) -> List[str]:
-    clean_lines = []
-    for line in lines:
-        if "," in line and "://" in line:
-            dollar_idx = line.rfind('$')
-            clean_lines.append(line[:dollar_idx] if dollar_idx != -1 else line)
-    return clean_lines
-
-def split_url_hash(lines: List[str]) -> List[str]:
-    split_lines = []
+def split_url(lines):
+    newlines = []
     for line in lines:
         if "," not in line or "://" not in line:
             continue
         channel_name, channel_url = line.split(',', 1)
         if "#" not in channel_url:
-            split_lines.append(line)
+            newlines.append(line)
         else:
             for url in channel_url.split('#'):
                 url = url.strip()
                 if "://" in url:
-                    split_lines.append(f"{channel_name},{url}")
-    return split_lines
+                    newlines.append(f"{channel_name},{url}")
+    return newlines
 
-def remove_duplicates_url(lines: List[str]) -> List[str]:
-    url_set, unique_lines = set(), []
+def clean_url(lines):
+    newlines = []
     for line in lines:
         if "," in line and "://" in line:
-            parts = line.split(',', 1)
-            if len(parts) < 2:
-                continue
-            url = parts[1].strip()
+            dollar_idx = line.rfind('$')
+            newlines.append(line[:dollar_idx] if dollar_idx != -1 else line)
+    return newlines
+
+def remove_duplicates_url(lines):
+    url_set, newlines = set(), []
+    for line in lines:
+        if "," in line and "://" in line:
+            _, url = line.split(',', 1)
+            url = url.strip()
             if url not in url_set:
                 url_set.add(url)
-                unique_lines.append(line)
-    return unique_lines
+                newlines.append(line)
+    return newlines
 
-def extract_whitelist_set(whitelist_lines: List[str]) -> set:
-    url_set = set()
-    for line in whitelist_lines:
-        if "," in line and "://" in line:
-            parts = line.split(',', 1)
-            if len(parts) >= 2:
-                url_set.add(parts[1].strip())
-    return url_set
-
-def process_line(line: str, whitelist_set: set) -> Tuple[Optional[float], Optional[str]]:
-    if not line or "#genre#" in line or "://" not in line:
+def process_line(line, whitelist):
+    if "#genre#" in line or "://" not in line or not line.strip():
         return None, None
-    line = line.strip()
-    if "," not in line:
+    parts = line.split(',', 1)
+    if len(parts) != 2:
         return None, None
-    
-    channel_name, url = line.split(',', 1)
+    name, url = parts
     url = url.strip()
-    if url in whitelist_set:
-        return 0.0, line
+    
+    # 白名单也检测真实响应时间，解决0.00ms问题
+    if url in whitelist:
+        elapsed_time, _ = check_url(url)
+        return elapsed_time if elapsed_time else 1.0, line
+    
     elapsed_time, is_valid = check_url(url)
     return (elapsed_time, line) if is_valid else (None, line)
 
-def process_urls_multithreaded(lines: List[str], whitelist_set: set, max_workers: int = MAX_WORKERS) -> Tuple[List[str], List[str]]:
-    success_list, black_list = [], []
+def process_urls_multithreaded(lines, whitelist, max_workers=MAX_WORKERS):
+    successlist, blacklist = [], []
     if not lines:
-        return success_list, black_list
-    
+        return successlist, blacklist
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(process_line, line, whitelist_set): line for line in lines}
+        futures = {executor.submit(process_line, line, whitelist): line for line in lines}
         for future in as_completed(futures):
-            elapsed_time, result_line = future.result()
-            if result_line:
-                if elapsed_time is not None:
-                    success_list.append(f"{elapsed_time:.2f}ms,{result_line}")
+            elapsed, result = future.result()
+            if result:
+                if elapsed is not None:
+                    successlist.append(f"{elapsed:.2f}ms,{result}")
                 else:
-                    black_list.append(result_line)
-    success_list.sort(key=lambda x: float(x.split(',')[0].replace('ms', '')))
-    black_list.sort()
-    return success_list, black_list
+                    blacklist.append(result)
+    successlist.sort(key=lambda x: float(x.split(',')[0].replace('ms', '')))
+    blacklist.sort()
+    return successlist, blacklist
 
-def generate_output_lines(success_list: List[str], black_list: List[str]) -> Tuple[List[str], List[str], List[str]]:
+def write_list(file_path, data_list):
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(data_list))
+        print(f"File generated: {file_path}")
+    except Exception as e:
+        print(f"Write file error {file_path}: {e}")
+
+def remove_prefix_from_lines(lines):
+    result = []
+    for line in lines:
+        if "," in line and "://" in line and "ms," in line:
+            result.append(",".join(line.split(",")[1:]))
+    return result
+
+def get_file_paths():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    parent2_dir = os.path.dirname(parent_dir)
+    return {
+        "urls": os.path.join(parent_dir, 'urls.txt'),
+        "live": os.path.join(parent2_dir, 'live.txt'),
+        "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
+        "others": os.path.join(parent2_dir, 'others.txt'),
+        "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
+        "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
+        "whitelist_auto_tv": os.path.join(current_dir, 'whitelist_auto_tv.txt'),
+        "blackhost_count": os.path.join(current_dir, "blackhost_count.txt")
+    }
+
+if __name__ == "__main__":
+    file_paths = get_file_paths()
+    remote_urls = read_txt_to_array(file_paths["urls"])
+    
+    for url in remote_urls:
+        if url.startswith("http"):
+            print(f"Process remote URL: {url}")
+            process_url(url)
+
+    lines_whitelist = read_txt_file(file_paths["whitelist_manual"])
+    lines = urls_all_lines
+
+    print(f"Original data count: {len(lines)}")
+    lines = split_url(lines)
+    lines_whitelist = split_url(lines_whitelist)
+    lines = clean_url(lines)
+    lines_whitelist = clean_url(lines_whitelist)
+    lines = remove_duplicates_url(lines)
+    lines_whitelist = remove_duplicates_url(lines_whitelist)
+    clean_count = len(lines)
+    print(f"Cleaned data count: {clean_count}")
+
+    whitelist_set = set()
+    for line in lines_whitelist:
+        if "," in line and "://" in line:
+            _, url = line.split(',', 1)
+            whitelist_set.add(url.strip())
+    print(f"Whitelist URL count: {len(whitelist_set)}")
+
+    successlist, blacklist = process_urls_multithreaded(lines, whitelist_set)
+    ok_count, ng_count = len(successlist), len(blacklist)
+    print(f"Check done - Success: {ok_count}, Failed: {ng_count}")
+
     bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
     version = f"{bj_time.strftime('%Y%m%d %H:%M')},url"
-    success_tv = [line.split(',', 1)[1] for line in success_list if ',' in line]
+    success_tv = remove_prefix_from_lines(successlist)
+
     success_output = [
-        "更新时间,#genre#", version, '',
+        "更新时间,#genre#", version, "",
         "RespoTime,whitelist,#genre#"
-    ] + success_list
+    ] + successlist
     success_tv_output = [
-        "更新时间,#genre#", version, '',
+        "更新时间,#genre#", version, "",
         "whitelist,#genre#"
     ] + success_tv
     black_output = [
-        "更新时间,#genre#", version, '',
+        "更新时间,#genre#", version, "",
         "blacklist,#genre#"
-    ] + black_list
-    return success_output, success_tv_output, black_output
+    ] + blacklist
 
-def save_blackhost_count(file_path: str) -> None:
-    if not blacklist_host_dict:
-        print("[INFO] 无黑名单Host记录")
-        return
-    sorted_hosts = sorted(blacklist_host_dict.items(), key=lambda x: x[1], reverse=True)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        for host, count in sorted_hosts:
-            f.write(f"{host}: {count}\n")
-    print(f"[SUCCESS] 黑名单Host统计已保存: {file_path}")
+    write_list(file_paths["whitelist_auto"], success_output)
+    write_list(file_paths["whitelist_auto_tv"], success_tv_output)
+    write_list(file_paths["blacklist_auto"], black_output)
 
-if __name__ == "__main__":
-    start_time = datetime.now()
-    print(f"[START] 程序开始执行: {start_time.strftime('%Y%m%d %H:%M:%S')}")
-    file_dirs = get_file_dirs()
-    url_statistics = []
-    urls_all_lines = []
-
-    remote_urls = read_txt_to_array(file_dirs["urls"])
-    for url in remote_urls:
-        if url.startswith("http"):
-            print(f"[PROCESS] 拉取远程源: {url}")
-            m3u_lines = process_remote_url(url)
-            url_statistics.append(f"{len(m3u_lines)},{url.strip()}")
-            urls_all_lines.extend(m3u_lines)
-            print(f"[PROCESS] 远程源 {url} 提取到 {len(m3u_lines)} 条数据")
-
-    print(f"[CLEAN] 原始数据条数: {len(urls_all_lines)}")
-    urls_all_lines = split_url_hash(urls_all_lines)
-    urls_all_lines = clean_url_dollar(urls_all_lines)
-    urls_all_lines = remove_duplicates_url(urls_all_lines)
-    clean_count = len(urls_all_lines)
-    print(f"[CLEAN] 清洗后数据条数: {clean_count}")
-
-    whitelist_lines = read_txt_file(file_dirs["whitelist_manual"])
-    whitelist_lines = split_url_hash(whitelist_lines)
-    whitelist_lines = clean_url_dollar(whitelist_lines)
-    whitelist_lines = remove_duplicates_url(whitelist_lines)
-    whitelist_set = extract_whitelist_set(whitelist_lines)
-    print(f"[WHITELIST] 白名单有效URL数: {len(whitelist_set)}")
-
-    print(f"[CHECK] 开始多线程检测URL，线程数: {MAX_WORKERS}")
-    success_list, black_list = process_urls_multithreaded(urls_all_lines, whitelist_set)
-    ok_count, ng_count = len(success_list), len(black_list)
-    print(f"[CHECK] 检测完成 - 成功: {ok_count} 条, 失败: {ng_count} 条")
-
-    success_output, success_tv_output, black_output = generate_output_lines(success_list, black_list)
-    write_list(file_dirs["whitelist_auto"], success_output)
-    write_list(file_dirs["whitelist_auto_tv"], success_tv_output)
-    write_list(file_dirs["blacklist_auto"], black_output)
-
-    save_blackhost_count(file_dirs["blackhost_count"])
+    if blacklist_dict:
+        sorted_hosts = sorted(blacklist_dict.items(), key=lambda x: x[1], reverse=True)
+        with open(file_paths["blackhost_count"], 'w', encoding='utf-8') as f:
+            for host, count in sorted_hosts:
+                f.write(f"{host}: {count}\n")
+        print(f"Blackhost count saved: {file_paths['blackhost_count']}")
+    else:
+        print("No blackhost records")
 
     end_time = datetime.now()
-    elapsed = end_time - start_time
-    total_seconds = int(elapsed.total_seconds())
-    minutes, seconds = total_seconds // 60, total_seconds % 60
+    elapsed = end_time - timestart
+    mins, secs = int(elapsed.total_seconds() // 60), int(elapsed.total_seconds() % 60)
+    print("="*50)
+    print(f"Start time: {timestart.strftime('%Y%m%d %H:%M:%S')}")
+    print(f"End time: {end_time.strftime('%Y%m%d %H:%M:%S')}")
+    print(f"Elapsed time: {mins} min {secs} sec")
+    print(f"Original count: {len(urls_all_lines)}")
+    print(f"Cleaned count: {clean_count}")
+    print(f"Success count: {ok_count}")
+    print(f"Failed count: {ng_count}")
+    print("="*50)
 
-    print("=" * 50)
-    print(f"[END] 程序执行完成: {end_time.strftime('%Y%m%d %H:%M:%S')}")
-    print(f"[STAT] 执行时间: {minutes} 分 {seconds} 秒")
-    print(f"[STAT] 原始数据: {len(urls_all_lines) + (ok_count + ng_count - clean_count)} 条")
-    print(f"[STAT] 清洗后: {clean_count} 条")
-    print(f"[STAT] 检测成功: {ok_count} 条")
-    print(f"[STAT] 检测失败: {ng_count} 条")
-    print("=" * 50)
-
-    if url_statistics:
-        print("[STAT] 远程源数据统计:")
-        for stat in url_statistics:
-            print(stat)
+    for stat in url_statistics:
+        print(stat)
