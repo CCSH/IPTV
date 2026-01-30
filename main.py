@@ -433,6 +433,7 @@ def process_channel_line(line):
                 if channel_address not in other_lines_url:
                     other_lines_url.append(channel_address)   #记录已加url
                     other_lines.append(line)
+                    
 def safe_quote_url(url):
     # 第一步：解码（无论是否编码，解码后统一为原始未编码状态）
     unquoted_url = unquote(url)
@@ -678,6 +679,7 @@ other_lines_hj = len(other_lines)
 print(f"blacklist行数: {combined_blacklist_hj} ")
 print(f"live.txt行数: {all_lines_hj} ")
 print(f"others.txt行数: {other_lines_hj} ")
+
 
 
 
