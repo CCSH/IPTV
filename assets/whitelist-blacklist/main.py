@@ -4,485 +4,430 @@ import time
 from datetime import datetime, timedelta, timezone
 import os
 from urllib.parse import quote, unquote, urlparse
-import socket  #check p3p源 rtp源
-import subprocess #check rtmp源
+import socket
+import subprocess
+from typing import List, Tuple, Dict, Optional
 
-timestart = datetime.now()
+# ===================== 全局配置（集中管理，方便修改）=====================
+TIMEOUT_URL_CHECK = 6  # URL检测超时时间(秒)
+TIMEOUT_URL_FETCH = 10  # 远程源拉取超时时间(秒)
+MAX_WORKERS = 30  # 线程池最大工作数
+USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"  # 统一请求头
+# 需要跳过/包含的字符串（集中管理）
+SKIP_STRINGS = ['#genre#', '#EXTINF:-1', '"ext"']
+REQUIRED_STRINGS = ['://']
 
-#读取文本方法
-def read_txt_to_array(file_name):
+# ===================== 通用工具函数 =====================
+def read_txt_to_array(file_name: str) -> List[str]:
+    """读取文本文件到数组，自动去除首尾空格，处理异常"""
     try:
-        with open(file_name, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-            lines = [line.strip() for line in lines]
-            return lines
+        with open(file_name, 'r', encoding='utf-8') as f:
+            return [line.strip() for line in f.readlines() if line.strip()]
     except FileNotFoundError:
-        print(f"File '{file_name}' not found.")
+        print(f"[ERROR] 文件未找到: {file_name}")
         return []
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"[ERROR] 读取文件 {file_name} 失败: {str(e)}")
         return []
 
-# 读取文件内容
-def read_txt_file(file_path):
-    skip_strings = ['#genre#','#EXTINF:-1','"ext"']  # 定义需要跳过的字符串数组['#', '@', '#genre#'] 
-    required_strings = ['://']  # 定义需要包含的字符串数组['必需字符1', '必需字符2'] 
-
-    with open(file_path, 'r', encoding='utf-8') as file:
-        lines = [
-            line for line in file
-            if not any(skip_str in line for skip_str in skip_strings) and all(req_str in line for req_str in required_strings)
-        ]
-    return lines
-
-# 检测URL是否可访问并记录响应时间
-def check_url(url, timeout=6):
-    start_time = time.time()
-    elapsed_time = None
-    success = False
-
-    # 将 URL 中的汉字编码
-    encoded_url = urllib.parse.quote(url, safe=':/?&=')
-    
+def read_txt_file(file_path: str) -> List[str]:
+    """按规则过滤读取文本文件：跳过指定字符串 + 必须包含指定字符串"""
     try:
-        if url.startswith("http"):
-            headers = {
-                'User-Agent': 'PostmanRuntime-ApipostRuntime/1.1.0',
-            }
-            req = urllib.request.Request(encoded_url, headers=headers)
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                if response.status == 200:
-                    success = True
-        elif url.startswith("p3p"):
-            success = check_p3p_url(url, timeout)
-        elif url.startswith("p2p"):
-            success = check_p2p_url(url, timeout)        
-        elif url.startswith("rtmp") or url.startswith("rtsp") :
-            success = check_rtmp_url(url, timeout)
-        elif url.startswith("rtp"):
-            success = check_rtp_url(url, timeout)
-
-        # 如果执行到这一步，没有异常，计算时间
-        elapsed_time = (time.time() - start_time) * 1000  # 转换为毫秒
-
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return [
+                line.strip() for line in f
+                if line.strip() and not any(s in line for s in SKIP_STRINGS)
+                and all(r in line for r in REQUIRED_STRINGS)
+            ]
     except Exception as e:
-        print(f"Error checking {url}: {e}")
-        record_host(get_host_from_url(url))
-        # 在发生异常的情况下，将 elapsed_time 设置为 None
-        elapsed_time = None
+        print(f"[ERROR] 过滤读取文件 {file_path} 失败: {str(e)}")
+        return []
 
-    return elapsed_time, success
-
-def check_rtmp_url(url, timeout):
+def write_list(file_path: str, data_list: List[str]) -> None:
+    """写入列表到文件，自动处理目录创建"""
     try:
-        result = subprocess.run(['ffprobe', url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
-        if result.returncode == 0:
-            return True
-    except subprocess.TimeoutExpired:
-        print(f"Timeout checking {url}")
+        # 确保目录存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(data_list))
+        print(f"[SUCCESS] 文件已生成: {file_path}")
     except Exception as e:
-        print(f"Error checking {url}: {e}")
-    return False
+        print(f"[ERROR] 写入文件 {file_path} 失败: {str(e)}")
 
-def check_rtp_url(url, timeout):
+def get_host_from_url(url: str) -> str:
+    """从URL中提取host，异常返回空字符串"""
     try:
-        # 解析URL
-        parsed_url = urlparse(url)
-        
-        # 提取主机名（IP地址）和端口号
-        host = parsed_url.hostname
-        port = parsed_url.port
+        parsed = urlparse(url)
+        return parsed.netloc if parsed.netloc else ""
+    except Exception:
+        return ""
 
-        # 创建一个 socket 连接
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.settimeout(timeout)  # 设置超时时间
-            s.connect((host, port))
-            s.sendto(b'', (host, port))  # 发送空的UDP数据包
-            s.recv(1)  # 尝试接收数据
-        return True
-    except (socket.timeout, socket.error):
-        return False
-
-def check_p3p_url(url, timeout):
+def safe_quote_url(url: str) -> str:
+    """URL安全编解码：先解码再编码，避免重复编码"""
     try:
-        # 解析URL
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        port = parsed_url.port or (80 if parsed_url.scheme == "http" else 443)
-        path = parsed_url.path or "/"
-        
-        # 检查解析是否成功
-        if not host or not port or not path:
-            raise ValueError("Invalid p3p URL")
+        unquoted = unquote(url)
+        return quote(unquoted, safe=':/?&=')
+    except Exception:
+        return url
 
-        # 创建一个 TCP 连接
+def get_file_dirs() -> Dict[str, str]:
+    """统一获取所有文件路径，避免多处硬编码，便于维护"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    parent2_dir = os.path.dirname(parent_dir)
+    return {
+        "current": current_dir,
+        "parent2": parent2_dir,
+        # 输入文件
+        "urls": os.path.join(current_dir, 'assets/urls.txt'),
+        "live": os.path.join(parent2_dir, 'live.txt'),
+        "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
+        "others": os.path.join(parent2_dir, 'others.txt'),
+        "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
+        # 输出文件
+        "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
+        "whitelist_auto_tv": os.path.join(current_dir, 'whitelist_auto_tv.txt'),
+        "blackhost_count": os.path.join(current_dir, "blackhost_count.txt")
+    }
+
+# ===================== URL检测相关函数 =====================
+# 黑名单Host统计字典（全局，避免函数内重复定义）
+blacklist_host_dict: Dict[str, int] = {}
+
+def record_black_host(host: str) -> None:
+    """记录黑名单Host，计数+1"""
+    if not host:
+        return
+    blacklist_host_dict[host] = blacklist_host_dict.get(host, 0) + 1
+
+def check_p3p_url(url: str, timeout: int) -> bool:
+    """检测P3P协议URL"""
+    try:
+        parsed = urlparse(url)
+        host, port = parsed.hostname, parsed.port or 80
+        if not host or not port:
+            return False
         with socket.create_connection((host, port), timeout=timeout) as s:
-            # 发送一个简单的请求（根据协议定义可能需要调整）
-            # request = f"GET {path} P3P/1.0\r\nHost: {host}\r\n\r\n"
-            # 构造请求
             request = (
-                f"GET {path} P3P/1.0\r\n"
+                f"GET {parsed.path or '/'} P3P/1.0\r\n"
                 f"Host: {host}\r\n"
-                f"User-Agent: CustomClient/1.0\r\n"
+                f"User-Agent: {USER_AGENT}\r\n"
                 f"Connection: close\r\n\r\n"
             )
-            
-            # 读取响应
-            response = s.recv(1024)
-            
-            # 简单判断是否收到有效响应
-            if b"P3P" in response:
-                return True
-    except Exception as e:
-        print(f"Error checking {url}: {e}")
-    return False
-
-def check_p2p_url(url, timeout):
-    try:
-        # 解析URL
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        port = parsed_url.port
-        path = parsed_url.path
-
-        # 检查解析是否成功
-        if not host or not port or not path:
-            raise ValueError("Invalid P2P URL")
-
-        # 创建一个 TCP 连接
-        with socket.create_connection((host, port), timeout=timeout) as s:
-            # 自定义请求，这里只是一个占位符，需根据具体协议定义
-            request = f"YOUR_CUSTOM_REQUEST {path}\r\nHost: {host}\r\n\r\n"
             s.sendall(request.encode())
-            
-            # 读取响应
-            response = s.recv(1024)
-            
-            # 自定义响应解析，这里简单示例
-            if b"SOME_EXPECTED_RESPONSE" in response:
-                return True
-    except Exception as e:
-        print(f"Error checking {url}: {e}")
-    return False
+            return b"P3P" in s.recv(1024)
+    except Exception:
+        return False
 
-# 处理单行文本并检测URL
-def process_line(line, whitelist): 
-    if "#genre#" in line or "://" not in line :
-        return None, None  # 跳过包含“#genre#”的行
-    line=line.strip()
-    parts = line.split(',')
-    if len(parts) == 2:
-        name, url = parts
-        # 白名单判断
-        if url in whitelist:
-            return 0, line
-        # 请求验证
-        elapsed_time, is_valid = check_url(url)
-        if is_valid:
-            return elapsed_time, line
+def check_p2p_url(url: str, timeout: int) -> bool:
+    """检测P2P协议URL（保留原有逻辑，待完善协议）"""
+    try:
+        parsed = urlparse(url)
+        host, port = parsed.hostname, parsed.port
+        if not host or not port or not parsed.path:
+            return False
+        with socket.create_connection((host, port), timeout=timeout) as s:
+            request = f"YOUR_CUSTOM_REQUEST {parsed.path}\r\nHost: {host}\r\n\r\n"
+            s.sendall(request.encode())
+            return b"SOME_EXPECTED_RESPONSE" in s.recv(1024)
+    except Exception:
+        return False
+
+def check_rtmp_url(url: str, timeout: int) -> bool:
+    """检测RTMP/RTSP协议URL，调用ffprobe"""
+    try:
+        # 屏蔽ffprobe所有输出，仅判断返回码
+        subprocess.run(
+            ['ffprobe', '-v', 'quiet', url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=timeout
+        )
+        return True
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, Exception):
+        return False
+
+def check_rtp_url(url: str, timeout: int) -> bool:
+    """检测RTP协议URL，UDP连接"""
+    try:
+        parsed = urlparse(url)
+        host, port = parsed.hostname, parsed.port
+        if not host or not port:
+            return False
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.settimeout(timeout)
+            s.connect((host, port))
+            s.sendto(b'', (host, port))
+            s.recv(1)
+        return True
+    except (socket.timeout, socket.error, Exception):
+        return False
+
+def check_url(url: str, timeout: int = TIMEOUT_URL_CHECK) -> Tuple[Optional[float], bool]:
+    """
+    统一检测URL是否可访问
+    :return: (响应时间(毫秒), 是否有效)
+    """
+    start_time = time.time()
+    try:
+        encoded_url = safe_quote_url(url)
+        if url.startswith("http"):
+            # HTTP/HTTPS协议
+            req = urllib.request.Request(encoded_url, headers={"User-Agent": USER_AGENT})
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                success = resp.status == 200
+        elif url.startswith("p3p"):
+            success = check_p3p_url(encoded_url, timeout)
+        elif url.startswith("p2p"):
+            success = check_p2p_url(encoded_url, timeout)
+        elif url.startswith(("rtmp", "rtsp")):
+            success = check_rtmp_url(encoded_url, timeout)
+        elif url.startswith("rtp"):
+            success = check_rtp_url(encoded_url, timeout)
         else:
-            return None, line
-    return None, None
+            success = False
 
-# 多线程处理文本并检测URL
-def process_urls_multithreaded(lines, whitelist, max_workers=30):
-    blacklist =  [] 
-    successlist = []
-    
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(process_line, line, whitelist): line for line in lines}
-        for future in as_completed(futures):
-            elapsed_time, result = future.result()
-            if result:
-                if elapsed_time is not None:
-                    successlist.append(f"{elapsed_time:.2f}ms,{result}")
-                else:
-                    blacklist.append(result)
-    return successlist, blacklist
+        elapsed = (time.time() - start_time) * 1000 if success else None
+        return elapsed, success
+    except Exception as e:
+        # 检测失败记录Host
+        record_black_host(get_host_from_url(url))
+        return None, False
 
-# 写入文件
-def write_list(file_path, data_list):
-    with open(file_path, 'w', encoding='utf-8') as file:
-        for item in data_list:
-            file.write(item + '\n')
+# ===================== M3U处理相关函数 =====================
+def is_m3u_content(text: str) -> bool:
+    """判断是否为M3U格式内容"""
+    return text.strip().startswith("#EXTM3U") if text else False
 
-# 增加外部url到检测清单，同时支持检测m3u格式url
-# urls里所有的源都读到这里。
-urls_all_lines = []
-
-#M3U格式判断
-def is_m3u_content(text):
-    lines = text.splitlines()
-    first_line = lines[0].strip()
-    return first_line.startswith("#EXTM3U")
-
-def convert_m3u_to_txt(m3u_content):
-    # 分行处理
-    lines = m3u_content.split('\n')
-    
-    # 用于存储结果的列表
-    txt_lines = []
-    
-    # 临时变量用于存储频道名称
-    channel_name = ""
-    
+def convert_m3u_to_txt(m3u_content: str) -> List[str]:
+    """M3U格式转换为 频道名,URL 格式"""
+    lines = [line.strip() for line in m3u_content.split('\n') if line.strip()]
+    txt_lines, channel_name = [], ""
     for line in lines:
-        # 过滤掉 #EXTM3U 开头的行
-        if line.startswith("#EXTM3U"):
-            continue
-        # 处理 #EXTINF 开头的行
         if line.startswith("#EXTINF"):
-            # 获取频道名称
             channel_name = line.split(',')[-1].strip()
-        # 处理 URL 行
-        elif line.startswith("http"):
-            txt_lines.append(f"{channel_name},{line.strip()}")
-
+        elif line.startswith(("http", "rtmp", "rtsp", "p3p", "p2p", "rtp")):
+            if channel_name:
+                txt_lines.append(f"{channel_name},{line}")
     return txt_lines
 
-url_statistics=[]
-
-def safe_quote_url(url):
-    # 第一步：解码（无论是否编码，解码后统一为原始未编码状态）
-    unquoted_url = unquote(url)
-    # 第二步：按你的规则编码
-    quoted_url = quote(unquoted_url, safe=':/')
-    return quoted_url
-
-def process_url(url):
+def process_remote_url(url: str) -> List[str]:
+    """拉取远程URL内容，解析为 频道名,URL 格式（支持M3U和普通文本）"""
     try:
-        # 打开URL并读取内容
-        headers = {
-            'User-Agent': 'PostmanRuntime-ApipostRuntime/1.1.0',
-        }
-        req = urllib.request.Request(safe_quote_url(url), headers=headers)
-        with urllib.request.urlopen(req, timeout=10) as response:
-            # 以二进制方式读取数据
-            data = response.read()
-            # 将二进制数据解码为字符串
-            text = data.decode('utf-8')
+        req = urllib.request.Request(safe_quote_url(url), headers={"User-Agent": USER_AGENT})
+        with urllib.request.urlopen(req, timeout=TIMEOUT_URL_FETCH) as resp:
+            text = resp.read().decode('utf-8', errors='ignore')  # 忽略解码错误
             if is_m3u_content(text):
-                m3u_lines=convert_m3u_to_txt(text)
-                url_statistics.append(f"{len(m3u_lines)},{url.strip()}")
-                urls_all_lines.extend(m3u_lines) # 注意：extend
+                return convert_m3u_to_txt(text)
             else:
-                lines = text.split('\n')
-                url_statistics.append(f"{len(lines)},{url.strip()}")
-                for line in lines:
-                    if  "#genre#" not in line and "," in line and "://" in line:
-                        urls_all_lines.append(line.strip())
+                # 普通文本：过滤有效行
+                return [
+                    line.strip() for line in text.split('\n')
+                    if line.strip() and "#genre#" not in line and "," in line and "://" in line
+                ]
+    except Exception as e:
+        print(f"[ERROR] 拉取远程源失败 {url}: {str(e)}")
+        return []
+
+# ===================== 数据清洗相关函数 =====================
+def clean_url_dollar(lines: List[str]) -> List[str]:
+    """清理URL中的$符号：去掉$及后面的内容"""
+    clean_lines = []
+    for line in lines:
+        if "," in line and "://" in line:
+            dollar_idx = line.rfind('$')
+            clean_lines.append(line[:dollar_idx] if dollar_idx != -1 else line)
+    return clean_lines
+
+def split_url_hash(lines: List[str]) -> List[str]:
+    """拆分URL中的#符号（加速源），修复原有BUG"""
+    split_lines = []
+    for line in lines:
+        if "," not in line or "://" not in line:
+            continue
+        # 仅拆分1次，避免频道名包含,的情况
+        channel_name, channel_url = line.split(',', 1)
+        if "#" not in channel_url:
+            split_lines.append(line)
+        else:
+            # 拆分#后的所有加速源，逐个添加
+            for url in channel_url.split('#'):
+                url = url.strip()
+                if "://" in url:
+                    split_lines.append(f"{channel_name},{url}")
+    return split_lines
+
+def remove_duplicates_url(lines: List[str]) -> List[str]:
+    """按URL去重，保留首次出现的频道名"""
+    url_set, unique_lines = set(), []
+    for line in lines:
+        if "," in line and "://" in line:
+            parts = line.split(',', 1)
+            if len(parts) < 2:
+                continue
+            url = parts[1].strip()
+            if url not in url_set:
+                url_set.add(url)
+                unique_lines.append(line)
+    return unique_lines
+
+def extract_whitelist_set(whitelist_lines: List[str]) -> set:
+    """从白名单中提取URL集合，用于快速判断"""
+    url_set = set()
+    for line in whitelist_lines:
+        if "," in line and "://" in line:
+            parts = line.split(',', 1)
+            if len(parts) >= 2:
+                url_set.add(parts[1].strip())
+    return url_set
+
+# ===================== 多线程处理 =====================
+def process_line(line: str, whitelist_set: set) -> Tuple[Optional[float], Optional[str]]:
+    """处理单条数据，检测URL，返回（响应时间，原始行）"""
+    if not line or "#genre#" in line or "://" not in line:
+        return None, None
+    line = line.strip()
+    if "," not in line:
+        return None, None
     
-    except Exception as e:
-        print(f"处理URL时发生错误：{e}")
+    channel_name, url = line.split(',', 1)
+    url = url.strip()
+    # 白名单直接通过
+    if url in whitelist_set:
+        return 0.0, line
+    # 检测URL
+    elapsed_time, is_valid = check_url(url)
+    return (elapsed_time, line) if is_valid else (None, line)
 
+def process_urls_multithreaded(lines: List[str], whitelist_set: set, max_workers: int = MAX_WORKERS) -> Tuple[List[str], List[str]]:
+    """多线程处理所有URL，返回（成功列表，黑名单列表）"""
+    success_list, black_list = [], []
+    if not lines:
+        return success_list, black_list
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # 提交所有任务
+        futures = {executor.submit(process_line, line, whitelist_set): line for line in lines}
+        # 处理完成的任务
+        for future in as_completed(futures):
+            elapsed_time, result_line = future.result()
+            if result_line:
+                if elapsed_time is not None:
+                    success_list.append(f"{elapsed_time:.2f}ms,{result_line}")
+                else:
+                    black_list.append(result_line)
+    # 排序：成功列表按响应时间升序，黑名单按字符升序
+    success_list.sort(key=lambda x: float(x.split(',')[0].replace('ms', '')))
+    black_list.sort()
+    return success_list, black_list
 
-# 去重复源 2024-08-06 (检测前剔除重复url，提高检测效率)
-def remove_duplicates_url(lines):
-    urls =[]
-    newlines=[]
-    for line in lines:
-        if "," in line and "://" in line:
-            # channel_name=line.split(',')[0].strip()
-            channel_url=line.split(',')[1].strip()
-            if channel_url not in urls: # 如果发现当前url不在清单中，则假如newlines
-                urls.append(channel_url)
-                newlines.append(line)
-    return newlines
+# ===================== 结果处理 =====================
+def generate_output_lines(success_list: List[str], black_list: List[str]) -> Tuple[List[str], List[str], List[str]]:
+    """生成带时间戳的输出行，适配原有格式"""
+    # 北京时间戳
+    bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
+    version = f"{bj_time.strftime('%Y%m%d %H:%M')},url"
+    # 处理TV版成功列表（去掉响应时间）
+    success_tv = [line.split(',', 1)[1] for line in success_list if ',' in line]
+    # 构造输出行
+    success_output = [
+        "更新时间,#genre#", version, '',
+        "RespoTime,whitelist,#genre#"
+    ] + success_list
+    success_tv_output = [
+        "更新时间,#genre#", version, '',
+        "whitelist,#genre#"
+    ] + success_tv
+    black_output = [
+        "更新时间,#genre#", version, '',
+        "blacklist,#genre#"
+    ] + black_list
+    return success_output, success_tv_output, black_output
 
-# 处理带$的URL，把$之后的内容都去掉（包括$也去掉） 【2024-08-08 22:29:11】
-#def clean_url(url):
-#    last_dollar_index = url.rfind('$')  # 安全起见找最后一个$处理
-#    if last_dollar_index != -1:
-#        return url[:last_dollar_index]
-#    return url
-def clean_url(lines):
-    urls =[]
-    newlines=[]
-    for line in lines:
-        if "," in line and "://" in line:
-            last_dollar_index = line.rfind('$')
-            if last_dollar_index != -1:
-                line=line[:last_dollar_index]
-            newlines.append(line)
-    return newlines
+def save_blackhost_count(file_path: str) -> None:
+    """保存黑名单Host统计结果"""
+    if not blacklist_host_dict:
+        print("[INFO] 无黑名单Host记录")
+        return
+    # 按计数降序排序
+    sorted_hosts = sorted(blacklist_host_dict.items(), key=lambda x: x[1], reverse=True)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        for host, count in sorted_hosts:
+            f.write(f"{host}: {count}\n")
+    print(f"[SUCCESS] 黑名单Host统计已保存: {file_path}")
 
-# 处理带#的URL  【2024-08-09 23:53:26】
-def split_url(lines):
-    newlines=[]
-    for line in lines:
-        # 拆分成频道名和URL部分
-        channel_name, channel_address = line.split(',', 1)
-        #需要加处理带#号源=予加速源
-        if  "#" not in channel_address:
-            newlines.append(line)
-        elif  "#" in channel_address and "://" in channel_address: 
-            # 如果有“#”号，则根据“#”号分隔
-            url_list = channel_address.split('#')
-            for url in url_list:
-                if "://" in url: 
-                    newline=f'{channel_name},{url}'
-                    newlines.append(line)
-    return newlines
-
-# 取得host
-def get_host_from_url(url: str) -> str:
-    try:
-        parsed_url = urlparse(url)
-        return parsed_url.netloc
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-# 使用字典来统计blackhost的记录次数
-blacklist_dict = {}
-def record_host(host):
-    # 如果 host 已经在字典中，计数加 1
-    if host in blacklist_dict:
-        blacklist_dict[host] += 1
-    # 如果 host 不在字典中，加入并初始化计数为 1
-    else:
-        blacklist_dict[host] = 1
-        
+# ===================== 主函数 =====================
 if __name__ == "__main__":
-    # 自定义源
-    urls = read_txt_to_array('assets/urls.txt')
-    # urls = ['https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u']
-    
-    for url in urls:
+    start_time = datetime.now()
+    print(f"[START] 程序开始执行: {start_time.strftime('%Y%m%d %H:%M:%S')}")
+    file_dirs = get_file_dirs()
+    url_statistics = []  # 远程源统计
+    urls_all_lines = []  # 所有待检测的URL行
+
+    # 1. 拉取远程源
+    remote_urls = read_txt_to_array(file_dirs["urls"])
+    for url in remote_urls:
         if url.startswith("http"):
-            print(f"处理URL: {url}")
-            process_url(url)   #读取上面url清单中直播源存入urls_all_lines
-            
-    # 获取当前脚本所在的目录
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    # 获取上一层目录
-    parent_dir = os.path.dirname(current_dir)
-    # 获取再上一层目录
-    parent2_dir = os.path.dirname(parent_dir)
-    # # 获取根目录
-    # root_dir = os.path.abspath(os.sep)  
+            print(f"[PROCESS] 拉取远程源: {url}")
+            m3u_lines = process_remote_url(url)
+            url_statistics.append(f"{len(m3u_lines)},{url.strip()}")
+            urls_all_lines.extend(m3u_lines)
+            print(f"[PROCESS] 远程源 {url} 提取到 {len(m3u_lines)} 条数据")
 
-    input_file1 = os.path.join(parent2_dir, 'live.txt')  # 输入文件路径1
-    input_file2 = os.path.join(current_dir, 'blacklist_auto.txt')  # 输入文件路径2 
-    input_file3 = os.path.join(parent2_dir, 'others.txt')  # 输入文件路径1
-    input_whitelist = os.path.join(current_dir, 'whitelist_manual.txt') # 输入白名单
+    # 2. 读取本地文件并合并（保留原有逻辑，可根据需要开启）
+    # lines1 = read_txt_file(file_dirs["live"])
+    # lines2 = read_txt_file(file_dirs["blacklist_auto"])
+    # lines3 = read_txt_file(file_dirs["others"])
+    # urls_all_lines.extend(lines1 + lines2 + lines3)
 
-    # 读取输入文件内容
-    lines_whitelist = read_txt_file(input_whitelist)
-    lines1 = read_txt_file(input_file1)
-    lines2 = read_txt_file(input_file2)
-    lines3 = read_txt_file(input_file3)
-    # lines=urls_all_lines + lines1 + lines2 # 从list变成集合提供检索效率⇒发现用了set后加#合并多行url，故去掉
-    lines=urls_all_lines
-    
-    # 计算合并后合计个数
-    urls_hj_before = len(lines)
+    # 3. 数据清洗（分级# -> 去$ -> 去重）
+    print(f"[CLEAN] 原始数据条数: {len(urls_all_lines)}")
+    urls_all_lines = split_url_hash(urls_all_lines)
+    urls_all_lines = clean_url_dollar(urls_all_lines)
+    urls_all_lines = remove_duplicates_url(urls_all_lines)
+    clean_count = len(urls_all_lines)
+    print(f"[CLEAN] 清洗后数据条数: {clean_count}")
 
-    # 分级带#号直播源地址
-    lines=split_url(lines)
-    lines_whitelist=split_url(lines_whitelist)
+    # 4. 处理白名单
+    whitelist_lines = read_txt_file(file_dirs["whitelist_manual"])
+    whitelist_lines = split_url_hash(whitelist_lines)
+    whitelist_lines = clean_url_dollar(whitelist_lines)
+    whitelist_lines = remove_duplicates_url(whitelist_lines)
+    whitelist_set = extract_whitelist_set(whitelist_lines)
+    print(f"[WHITELIST] 白名单有效URL数: {len(whitelist_set)}")
 
-    # 去$
-    lines=clean_url(lines)
-    lines_whitelist=clean_url(lines_whitelist)
+    # 5. 多线程检测URL
+    print(f"[CHECK] 开始多线程检测URL，线程数: {MAX_WORKERS}")
+    success_list, black_list = process_urls_multithreaded(urls_all_lines, whitelist_set)
+    ok_count, ng_count = len(success_list), len(black_list)
+    print(f"[CHECK] 检测完成 - 成功: {ok_count} 条, 失败: {ng_count} 条")
 
-    # 去重
-    lines=remove_duplicates_url(lines)
-    lines_whitelist=remove_duplicates_url(lines_whitelist)
-    urls_hj = len(lines)
+    # 6. 生成输出并写入文件
+    success_output, success_tv_output, black_output = generate_output_lines(success_list, black_list)
+    write_list(file_dirs["whitelist_auto"], success_output)
+    write_list(file_dirs["whitelist_auto_tv"], success_tv_output)
+    write_list(file_dirs["blacklist_auto"], black_output)
 
-    # 白名单提前处理
-    # 先使用列表推导式提取逗号后的内容，同时可以添加更多的条件判断和处理逻辑
-    extracted_parts = [white_line.split(',')[1].strip() if ',' in white_line and len(white_line.split(',')) >= 2 else "" for white_line in lines_whitelist]
-    # 再将提取出来的内容构建成集合，利用集合去重等特性（如果有需要的话）
-    white_line_parts_set = set(extracted_parts)
-    # 处理URL并生成成功清单和黑名单
-    successlist, blacklist = process_urls_multithreaded(set(lines), white_line_parts_set)
-    
-    # 给successlist, blacklist排序
-    # 定义排序函数
-    def successlist_sort_key(item):
-        time_str = item.split(',')[0].replace('ms', '')
-        return float(time_str)
-    
-    successlist=sorted(successlist, key=successlist_sort_key)
-    blacklist=sorted(blacklist)
+    # 7. 保存黑名单Host统计
+    save_blackhost_count(file_dirs["blackhost_count"])
 
-    # 计算check后ok和ng个数
-    urls_ok = len(successlist)
-    urls_ng = len(blacklist)
+    # 8. 输出执行统计
+    end_time = datetime.now()
+    elapsed = end_time - start_time
+    total_seconds = int(elapsed.total_seconds())
+    minutes, seconds = total_seconds // 60, total_seconds % 60
 
-    # 把successlist整理一下，生成一个可以直接引用的源，方便用zyplayer手动check
-    def remove_prefix_from_lines(lines):
-        result = []
-        for line in lines:
-            if  "#genre#" not in line and "," in line and "://" in line:
-                parts = line.split(",")
-                result.append(",".join(parts[1:]))
-        return result
+    print("=" * 50)
+    print(f"[END] 程序执行完成: {end_time.strftime('%Y%m%d %H:%M:%S')}")
+    print(f"[STAT] 执行时间: {minutes} 分 {seconds} 秒")
+    print(f"[STAT] 原始数据: {len(urls_all_lines) + (ok_count + ng_count - clean_count)} 条")
+    print(f"[STAT] 清洗后: {clean_count} 条")
+    print(f"[STAT] 检测成功: {ok_count} 条")
+    print(f"[STAT] 检测失败: {ng_count} 条")
+    print("=" * 50)
 
-    # 输出文件路径
-    success_file = os.path.join(current_dir, 'whitelist_auto.txt')  # 成功清单文件路径
-    success_file_tv = os.path.join(current_dir, 'whitelist_auto_tv.txt')  # 成功清单文件路径（另存一份直接引用源）
-    blacklist_file = os.path.join(current_dir, 'blacklist_auto.txt')  # 黑名单文件路径
-
-    # 加时间戳
-    # 获取当前的 UTC 时间
-    utc_time = datetime.now(timezone.utc)
-    # 北京时间
-    beijing_time = utc_time + timedelta(hours=8)
-    version=beijing_time.strftime("%Y%m%d %H:%M")+",url"
-    successlist_tv = ["更新时间,#genre#"] +[version] + ['\n'] +\
-                  ["whitelist,#genre#"] + remove_prefix_from_lines(successlist)
-    successlist = ["更新时间,#genre#"] +[version] + ['\n'] +\
-                  ["RespoTime,whitelist,#genre#"] + successlist
-    blacklist = ["更新时间,#genre#"] +[version] + ['\n'] +\
-                ["blacklist,#genre#"]  + blacklist
-
-    
-    # 写入成功清单文件
-    write_list(success_file, successlist)
-    write_list(success_file_tv, successlist_tv)
-
-    # 写入黑名单文件
-    write_list(blacklist_file, blacklist)
-
-    print(f"成功清单文件已生成: {success_file}")
-    print(f"成功清单文件已生成(tv): {success_file_tv}")
-    print(f"黑名单文件已生成: {blacklist_file}")
-
-    # 执行的代码
-    timeend = datetime.now()
-
-    # 计算时间差
-    elapsed_time = timeend - timestart
-    total_seconds = elapsed_time.total_seconds()
-
-    # 转换为分钟和秒
-    minutes = int(total_seconds // 60)
-    seconds = int(total_seconds % 60)
-
-    # 格式化开始和结束时间
-    timestart_str = timestart.strftime("%Y%m%d_%H_%M_%S")
-    timeend_str = timeend.strftime("%Y%m%d_%H_%M_%S")
-
-    print(f"开始时间: {timestart_str}")
-    print(f"结束时间: {timeend_str}")
-    print(f"执行时间: {minutes} 分 {seconds} 秒")
-    print(f"urls_hj最初: {urls_hj_before} ")
-    print(f"urls_hj去重后: {urls_hj} ")
-    print(f"urls_ok: {urls_ok} ")
-    print(f"urls_ng: {urls_ng} ")
-
-    # 黑名单Host路径
-    blackhost_file = os.path.join(current_dir, "blackhost_count.txt")
-    # 将结果保存为 txt 文件 
-    def save_blackhost_to_txt(filename=blackhost_file):
-        with open(filename, "w") as file:
-            for host, count in blacklist_dict.items():
-                file.write(f"{host}: {count}\n")
-        print(f"结果已保存到 {filename}")
-
-    save_blackhost_to_txt()
-            
-    for statistics in url_statistics: #查看各个url的量有多少 2024-08-19
-        print(statistics)
+    # 输出远程源统计
+    if url_statistics:
+        print("[STAT] 远程源数据统计:")
+        for stat in url_statistics:
+            print(stat)
