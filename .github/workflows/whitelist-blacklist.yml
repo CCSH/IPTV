@@ -34,9 +34,8 @@ jobs:
         env:
           PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
 
-      - name: 校验并运行脚本
+      - name: 运行脚本
         run: |
-          [ ! -f "assets/whitelist-blacklist/main.py" ] && echo "❌ 脚本不存在" && exit 1
           chmod +x assets/whitelist-blacklist/main.py
           python assets/whitelist-blacklist/main.py
         env:
