@@ -1,5 +1,5 @@
 import urllib.request
-import urllib.parse
+from urllib.parse import quote, unquote
 import re #正则
 import os
 from datetime import datetime, timedelta, timezone
@@ -433,7 +433,13 @@ def process_channel_line(line):
                 if channel_address not in other_lines_url:
                     other_lines_url.append(channel_address)   #记录已加url
                     other_lines.append(line)
-                    
+def safe_quote_url(url):
+    # 第一步：解码（无论是否编码，解码后统一为原始未编码状态）
+    unquoted_url = unquote(url)
+    # 第二步：按你的规则编码
+    quoted_url = quote(unquoted_url, safe=':/')
+    return quoted_url
+    
 def process_url(url):
     print(f"处理URL: {url}")
     try:
@@ -443,7 +449,7 @@ def process_url(url):
         headers = {
             'User-Agent': 'PostmanRuntime-ApipostRuntime/1.1.0',
         }
-        req = urllib.request.Request(urllib.parse.quote(url, safe=':/'), headers=headers)
+        req = urllib.request.Request(safe_quote_url(url), headers=headers)
         # 打开URL并读取内容
         with urllib.request.urlopen(req,timeout=10) as response:
             # 以二进制方式读取数据
@@ -672,5 +678,6 @@ other_lines_hj = len(other_lines)
 print(f"blacklist行数: {combined_blacklist_hj} ")
 print(f"live.txt行数: {all_lines_hj} ")
 print(f"others.txt行数: {other_lines_hj} ")
+
 
 
