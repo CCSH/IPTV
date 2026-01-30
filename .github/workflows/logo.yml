@@ -3,7 +3,7 @@ env:
   TZ: Asia/Shanghai
   LOGO_DIR: "logo"
   FILE_EXT: "png"
-  MIN_FILE_SIZE: "1K"
+  MIN_FILE_SIZE: "1k"
 on:
   workflow_dispatch:
   schedule:
