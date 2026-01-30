@@ -11,8 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0
-        ref: main
+        fetch-depth: 1
     - name: Update EPG Files
       run: |
         rm -rf e.xml e.xml.gz
