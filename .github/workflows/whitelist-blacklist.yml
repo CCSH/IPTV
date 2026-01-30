@@ -6,34 +6,49 @@ on:
 jobs:
   run_job:
     runs-on: ubuntu-latest
+    # 赋予提交代码的权限（新版 Actions 建议显式声明，避免推送权限不足）
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4  # 升级到最新版，更稳定
+        with:
+          fetch-depth: 0  # 拉取完整仓库历史，适配 rebase 操作
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5  # 升级到最新版
         with:
           python-version: '3.10'
-      - name: Install dependencies
+          cache: 'pip'  # 缓存 pip 依赖，加速下次运行
+
+      - name: 安装系统依赖（ffprobe，脚本检测RTMP/RTSP必需）
+        run: sudo apt-get update -y && sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install opencc-python-reimplemented
+
+      - name: 赋予脚本执行权限（避免权限不足）
+        run: chmod +x assets/whitelist-blacklist/main.py
+
       - name: Run Python script
-        run: |
-          python assets/whitelist-blacklist/main.py
+        run: python assets/whitelist-blacklist/main.py
+
       - name: 配置Git并暂存文件
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git add ./assets/whitelist-blacklist/*
+          git add ./assets/whitelist-blacklist/* 2>/dev/null  # 加错误屏蔽，兼容空文件场景
+
       - name: 提交并推送变更
         run: |
-          # 前置检查暂存区是否有变更，无变更直接跳过后续操作
           if git diff --cached --quiet; then
             echo "ℹ️ 无黑白名单文件修改，跳过提交推送"
           else
-            git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
+            git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
             git pull --rebase origin main || true
-            git push origin main
+            git push origin main -f  # 加-f强制推送，兜底极少数rebase后推送失败场景
             echo "✅ 黑白名单更新并推送完成"
           fi
         env:
