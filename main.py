@@ -303,11 +303,8 @@ def sort_channel_data(channel_data: list, chn_type: str, cfg_list: list) -> list
         cfg_index_map = {cfg_name: idx for idx, cfg_name in enumerate(cfg_list)}
         def _ordered_key(line):
             name = line.split(',')[0] if ',' in line else ""
-            for cfg_name in cfg_list:
-                if name == cfg_name:
-                    return cfg_index_map[cfg_name]
-            return len(cfg_list)
-        return sorted(channel_data, key=_ordered_key, stable=True)
+            return cfg_index_map.get(name, len(cfg_list))
+        return sorted(channel_data, key=_ordered_key)
     else:
         def _dict_key(line):
             name = line.split(',')[0] if ',' in line else ""
