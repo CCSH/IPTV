@@ -10,7 +10,7 @@ import subprocess
 timestart = datetime.now()
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
 TIMEOUT_CHECK = 5
-TIMEOUT_FETCH = 10
+TIMEOUT_FETCH = 8
 MAX_WORKERS = 30
 blacklist_dict = {}
 urls_all_lines = []
