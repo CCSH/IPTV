@@ -2,7 +2,7 @@ name: 'Live Update'
 
 on:
   schedule:
-    - cron: '0 20 * * *' # UTC
+    - cron: '0 20 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -24,9 +24,7 @@ jobs:
 
       - name: Run Python script
         run: |
-          # 删除旧文件，不存在则忽略，避免内容残留
           rm -f live.txt live.m3u live_lite.txt live_lite.m3u others.txt
-          # 执行Python脚本生成新文件
           python main.py
 
       - name: Commit changes
@@ -34,7 +32,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add live.txt live.m3u live_lite.txt live_lite.m3u others.txt
-          git commit -m "Live Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d) (CST)"
+          git commit -m "Live Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
