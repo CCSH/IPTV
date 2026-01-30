@@ -34,7 +34,9 @@ jobs:
           git add live.txt live.m3u live_lite.txt live_lite.m3u others.txt
           git commit -m "Live Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: 推送合并结果到仓库
+        run: |
+          git pull --rebase origin main || true
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
