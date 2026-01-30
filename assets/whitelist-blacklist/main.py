@@ -9,7 +9,7 @@ import subprocess
 from typing import List, Tuple, Dict, Optional
 
 TIMEOUT_URL_CHECK = 3
-TIMEOUT_URL_FETCH = 10
+TIMEOUT_URL_FETCH = 5
 MAX_WORKERS = 50
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
 SKIP_STRINGS = ['#genre#', '#EXTINF:-1', '"ext"']
