@@ -7,7 +7,7 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 5'  # UTC周五00:00 → 北京时间周五08:00
+    - cron: '0 0 * * 5'
 jobs:
   sync-logo:
     runs-on: ubuntu-latest
@@ -25,7 +25,6 @@ jobs:
       - name: 同步Logo文件
         run: |
           set -euo pipefail
-          # 仓库配置：url|目标目录|标签
           REPOS=(
             "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
             "https://github.com/fanmingming/live.git|tv|fanmingming-live"
@@ -34,47 +33,35 @@ jobs:
             IFS='|' read -r URL DIR TAG <<< "$REPO"
             TEMP_DIR="temp_$TAG"
             echo "处理仓库：$TAG"
-            # 稀疏克隆仅目标目录，提升效率
             git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { echo "克隆失败，跳过"; continue; }
             cd "$TEMP_DIR" && git sparse-checkout set "$DIR" 2>/dev/null || { cd ..; rm -rf "$TEMP_DIR"; echo "目录不存在，跳过"; continue; }
             cd ..
-            # 核心：复制新文件，同名直接覆盖，无同名则新增，保留其他旧文件
-            find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" -print0 | xargs -0 -I {} bash -c '
-              FILE="{}"
-              NAME=$(basename "$FILE")
-              cp -f "$FILE" "'"$LOGO_DIR"'" 
-            '
-            # 清理临时文件
+            find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" -print0 | while IFS= read -r -d '' PNG_FILE; do
+              cp -f "$PNG_FILE" "$LOGO_DIR/"
+            done
             rm -rf "$TEMP_DIR"
           done
-          # 仅清理本次同步的无效文件（过小/空文件），不碰旧文件
           find "$LOGO_DIR" -type f -name "*.$FILE_EXT" ! -size +"$MIN_FILE_SIZE" -delete
 
       - name: 强制提交推送
         run: |
           set -euo pipefail
-          # 配置Git机器人用户
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 检查logo目录是否有有效文件
           if [ -z "$(ls -A "$LOGO_DIR"/*.$FILE_EXT 2>/dev/null)" ]; then
             echo "ℹ️ 无有效Logo文件，跳过提交推送"
             exit 0
           fi
           
-          # 拉取最新代码
           git pull origin main --rebase --autostash 2>/dev/null || true
-          # 强制添加logo目录所有变更文件，忽略差异
           git add -f "$LOGO_DIR/"/*.$FILE_EXT
           
-          # 检查是否有实际变更
           if git diff --cached --quiet; then
             echo "ℹ️ Logo文件无新增/更新，跳过提交推送"
             exit 0
           fi
           
-          # 提交并强制推送，仅覆盖logo目录的变更，不影响仓库其他文件
           git commit -m "Logo Update: $(date +'%Y-%m-%d') (CST)"
           git push origin main -f
           echo "✅ 推送成功！已新增/更新logo，旧logo已保留"
