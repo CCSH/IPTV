@@ -1,47 +1,35 @@
 name: EPG Update
 on:
   schedule:
-    - cron: '30 16,20,0,4,8,12 * * *'  # 北京时间00:30、04:30...16:30
-  workflow_dispatch:  # 手动触发
-
+    - cron: '30 16,20,0,4,8,12 * * *'
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4 
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        # 拉取最新代码，避免本地与远程冲突
         ref: main
-    
     - name: Update EPG Files
       run: |
-        # 初始化变量，确保旧文件彻底清理
         rm -rf e.xml e.xml.gz
         touch e.xml e.xml.gz && rm -f e.xml e.xml.gz
-        
-        # 定义EPG源列表（按优先级排序，可自行增减）
         EPG_SOURCES=(
           "https://epg.112114.xyz/pp.xml"
           "http://e.erw.cc/all.xml"
           "https://epg.zsdc.eu.org/t.xml"
           "http://epg.51zmt.top:8000/e1.xml"
         )
-
-        # 循环尝试下载，强制忽略wget报错，继续执行
         DOWNLOAD_SUCCESS=0
         for SOURCE in "${EPG_SOURCES[@]}"; do
           echo "尝试下载EPG源: $SOURCE"
-          # 增加-v显示简要日志，方便排查，超时20s，重试2次
           wget -v -T 20 -O e.xml "$SOURCE" -t 2 || true
-          
-          # 检查文件是否存在、非空、且是有效XML
           if [ -f e.xml ] && [ -s e.xml ] && head -1 e.xml | grep -q "<?xml"; then
             echo "✅ 成功下载有效EPG源: $SOURCE"
             DOWNLOAD_SUCCESS=1
-            # 强制刷新文件修改时间
             touch e.xml
             break
           else
@@ -49,47 +37,32 @@ jobs:
             rm -f e.xml
           fi
         done
-        
-        # 所有源都失败时终止任务
         if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
           echo "❌ 所有EPG源下载失败，任务终止"
           exit 1
         fi
-        
-        # 压缩文件
         echo "🔧 开始压缩e.xml到e.xml.gz"
         gzip -9 -c e.xml > e.xml.gz
-        # 验证压缩文件有效性
         if [ ! -s e.xml.gz ]; then
           echo "❌ 压缩文件生成失败"
           exit 1
         fi
-        
-        # 配置git用户信息（固定）
+    - name: 配置Git并暂存文件
+      run: |
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        
-        # 强制添加文件
-        git add -f e.xml e.xml.gz
-        
-        # 检查是否有变更，无变更则跳过提交
-        if git diff --cached --quiet; then
-          echo "ℹ️ No changes to commit，文件无更新"
-          exit 0
-        fi
-        
-        # 提交更
-        git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
-        echo "✅ 本地提交成功，准备推送到远程"
-    
-    - name: Push changes to GitHub
+        git add -f e.xml e.xml.gz 2>/dev/null
+    - name: 提交并推送变更
       run: |
-        # 拉取远程最新代码
-        git fetch origin main
-        # 若远程e.xml有变更，先合并，优先保留本地刚生成的文件
-        git checkout --theirs main -- e.xml e.xml.gz || true
-        git rebase origin/main || true
-        # 强制推送（确保变更被推送到远程，权限足够）
-        git push origin main -f
+        if git diff --cached --quiet; then
+          echo "ℹ️ 无EPG文件变更，跳过提交推送"
+        else
+          git fetch origin main
+          git checkout --theirs main -- e.xml e.xml.gz || true
+          git rebase origin/main || true
+          git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
+          git push origin main -f
+          echo "✅ EPG文件更新完成并强制推送成功"
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
