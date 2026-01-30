@@ -1,25 +1,24 @@
 name: 'Live Update'
 on:
   schedule:
-    - cron: '0 20 * * *'  # 北京时间次日4点执行（UTC+8）
-  workflow_dispatch:      # 手动触发
+    - cron: '0 20 * * *'
+  workflow_dispatch:
 
 jobs:
   run_job:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 【修改1：核心】添加写权限，允许Git推送代码
+      contents: write  # 核心写权限，必须保留
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 【修改2：优化】拉取完整仓库历史，避免rebase冲突
+          fetch-depth: 0  # 拉取完整历史，避免rebase冲突
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          cache: 'pip'  # 【优化】缓存pip依赖，加快下次运行速度
+          python-version: '3.10' 
 
       - name: Install dependencies
         run: |
@@ -28,7 +27,7 @@ jobs:
 
       - name: Run Python script
         run: |
-          rm -f live.txt live.m3u live_lite.txt live_lite.m3u others.txt  # 清理旧文件
+          rm -f live.txt live.m3u live_lite.txt live_lite.m3u others.txt
           python main.py
 
       - name: 配置Git并暂存文件
@@ -43,8 +42,8 @@ jobs:
             echo "ℹ️ 无直播文件修改，跳过提交推送"
           else
             git commit -m "Live Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
-            git pull --rebase origin main --autostash || true  # 【修改3：优化】自动暂存本地变更，避免rebase失败
-            git push origin main -f  # 【修改4：优化】强制推送，解决rebase后分支不一致问题
+            git pull --rebase origin main --autostash || true
+            git push origin main -f
             echo "✅ 直播文件更新并推送完成"
           fi
         env:
