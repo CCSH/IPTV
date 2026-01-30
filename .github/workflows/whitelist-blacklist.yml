@@ -38,8 +38,6 @@ jobs:
         run: |
           chmod +x assets/whitelist-blacklist/main.py
           python assets/whitelist-blacklist/main.py
-        env:
-          PYTHONUNBUFFERED: 1
 
       - name: 配置Git
         run: |
@@ -53,14 +51,14 @@ jobs:
         continue-on-error: true
         id: stage-files
   
-      - name: 提交并推送
+      - name: 提交并【强制覆盖】推送
         run: |
           if git diff --cached --name-only | grep -q .; then
             git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
-            git push origin HEAD:$GITHUB_REF_NAME --force-with-lease
-            echo "✅ 推送完成"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 强制推送完成"
           else
-            echo "ℹ️ 无变更，跳过"
+            echo "ℹ️ 无变更，跳过推送"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
