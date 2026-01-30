@@ -1,70 +1,70 @@
 name: 'WhiteList BlackList'
 on:
   schedule:
-    - cron: '0 16 * * 4'  # 北京时间0点（UTC+8，UTC16点）每周四执行
-  workflow_dispatch:  # 手动触发
+    - cron: '0 16 * * 4'
+  workflow_dispatch:
 
 jobs:
-  run_job:
+  run-whitelist-blacklist:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 赋予提交/推送代码权限
+      contents: write
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 拉取完整仓库历史
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip'
 
-      - name: 安装系统依赖（ffmpeg/ffprobe）
-        run: sudo apt-get update -y && sudo apt-get install -y ffmpeg
+      - name: 安装系统依赖
+        run: sudo apt-get update -y && sudo apt-get install -y --no-install-recommends ffmpeg && ffmpeg -version && ffprobe -version
 
       - name: 安装Python依赖
-        run: |
-          python -m pip install --upgrade pip
-          pip install opencc-python-reimplemented
-        # 可选：手动指定缓存目录，加速依赖安装
+        run: python -m pip install --upgrade pip --no-cache-dir && pip install opencc-python-reimplemented --no-cache-dir
         env:
           PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
 
-      - name: 赋予脚本执行权限
-        run: chmod +x assets/whitelist-blacklist/main.py
+      - name: 校验并运行脚本
+        run: |
+          [ ! -f "assets/whitelist-blacklist/main.py" ] && echo "❌ 脚本不存在" && exit 1
+          chmod +x assets/whitelist-blacklist/main.py
+          python assets/whitelist-blacklist/main.py
+        env:
+          PYTHONUNBUFFERED: 1
 
-      - name: 运行Python黑白名单脚本
-        run: python assets/whitelist-blacklist/main.py
-        # 可选：指定工作目录为仓库根，避免路径问题
-        working-directory: ${{ github.workspace }}
-
-      - name: 配置Git用户信息
+      - name: 配置Git
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local core.autocrlf false
+          git config --local core.filemode false
 
-      - name: 暂存修改的文件
-        run: |
-          # 仅暂存黑白名单相关的txt文件，避免误加其他文件
-          git add assets/whitelist-blacklist/*.txt 2>/dev/null
-          # 屏蔽空输出错误，无文件修改时不报错
+      - name: 暂存文件
+        run: git add --force assets/whitelist-blacklist/*.txt
         continue-on-error: true
+        id: stage-files
 
-      - name: 提交并推送变更
+      - name: 提交并推送
         run: |
-          # 检查是否有暂存的修改
-          if git diff --cached --quiet; then
-            echo "ℹ️ 无黑白名单文件修改，跳过提交推送"
-          else
-            # 上海时区格式化时间
-            COMMIT_MSG="黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
+          if git diff --cached --name-only | grep -q .; then
+            COMMIT_MSG="黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
             git commit -m "$COMMIT_MSG"
-            # 拉取最新代码并合并，避免冲突（替代rebase，更安全）
-            git pull origin main --rebase --autostash || true
-            # 普通推送，非必要不使用-f强制推送（保护主分支）
-            git push origin main
-            echo "✅ 黑白名单更新并推送至main分支完成"
+            git pull origin $GITHUB_REF_NAME --rebase --autostash --quiet
+            git push origin HEAD:$GITHUB_REF_NAME --quiet
+            echo "✅ 推送完成"
+          else
+            echo "ℹ️ 无变更，跳过"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.stage-files.outcome == 'success'
