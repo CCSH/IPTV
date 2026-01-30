@@ -9,7 +9,7 @@ import subprocess
 from typing import List, Tuple, Dict, Optional
 
 TIMEOUT_URL_CHECK = 3
-TIMEOUT_URL_FETCH = 5
+TIMEOUT_URL_FETCH = 10
 MAX_WORKERS = 50
 USER_AGENT = "PostmanRuntime-ApipostRuntime/1.1.0"
 SKIP_STRINGS = ['#genre#', '#EXTINF:-1', '"ext"']
@@ -187,8 +187,7 @@ def convert_m3u_to_txt(m3u_content: str) -> List[str]:
 def process_remote_url(url: str) -> List[str]:
     try:
         req = urllib.request.Request(safe_quote_url(url), headers={"User-Agent": USER_AGENT})
-        req.set_timeout(TIMEOUT_URL_FETCH)
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=TIMEOUT_URL_FETCH) as resp:
             text = resp.read().decode('utf-8', errors='ignore')
             if is_m3u_content(text):
                 return convert_m3u_to_txt(text)
