@@ -9,7 +9,7 @@ on:
   schedule:
     - cron: '0 0 * * 5'  # UTC周五00:00 → 北京时间周五08:00
 jobs:
-  sync-by-clone:
+  sync-logo:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,10 +19,10 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 初始化logo目录（仅创建不清理，保留旧文件）
+      - name: 初始化logo目录
         run: mkdir -p "$LOGO_DIR" && chmod 755 "$LOGO_DIR"
 
-      - name: 同步Logo文件（新增/覆盖同名，保留旧文件）
+      - name: 同步Logo文件
         run: |
           set -euo pipefail
           # 仓库配置：url|目标目录|标签
@@ -50,7 +50,7 @@ jobs:
           # 仅清理本次同步的无效文件（过小/空文件），不碰旧文件
           find "$LOGO_DIR" -type f -name "*.$FILE_EXT" ! -size +"$MIN_FILE_SIZE" -delete
 
-      - name: 强制提交推送（避免冲突，仅更新logo目录变更）
+      - name: 强制提交推送
         run: |
           set -euo pipefail
           # 配置Git机器人用户
@@ -63,19 +63,19 @@ jobs:
             exit 0
           fi
           
-          # 拉取最新代码（自动暂存修改，失败不中断，为强制推送铺路）
+          # 拉取最新代码
           git pull origin main --rebase --autostash 2>/dev/null || true
           # 强制添加logo目录所有变更文件，忽略差异
           git add -f "$LOGO_DIR/"/*.$FILE_EXT
           
-          # 检查是否有实际变更（无变更则跳过）
+          # 检查是否有实际变更
           if git diff --cached --quiet; then
             echo "ℹ️ Logo文件无新增/更新，跳过提交推送"
             exit 0
           fi
           
           # 提交并强制推送，仅覆盖logo目录的变更，不影响仓库其他文件
-          git commit -m "Logo Update: $(date +'%Y-%m-%d %H:%M:%S') (CST)"
+          git commit -m "Logo Update: $(date +'%Y-%m-%d') (CST)"
           git push origin main -f
           echo "✅ 推送成功！已新增/更新logo，旧logo已保留"
         env:
