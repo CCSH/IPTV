@@ -12,6 +12,8 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 1
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
     - name: Update EPG Files
       run: |
         rm -rf e.xml e.xml.gz
