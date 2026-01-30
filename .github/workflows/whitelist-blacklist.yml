@@ -2,8 +2,8 @@ name: 'WhiteList BlackList'
 
 on:
   schedule:
-    - cron: '0 16 * * 4' # UTC
-  workflow_dispatch:
+    - cron: '0 16 * * 4' # UTC，对应北京时间次日0点
+  workflow_dispatch: # 手动触发
 
 jobs:
   run_job:
@@ -31,7 +31,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add ./assets/whitelist-blacklist/*
-          git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d) (CST)"
+          git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d') (CST)"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
