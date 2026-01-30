@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 拉取完整历史，避免rebase冲突
+          fetch-depth: 1 
 
       - name: Set up Python
         uses: actions/setup-python@v5
