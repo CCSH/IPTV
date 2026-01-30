@@ -111,32 +111,34 @@ def check_rtp_url(url, timeout):
     except Exception:
         return False
 
+# 核心修复：重构check_url，所有协议统一统计真实耗时
 def check_url(url, timeout=TIMEOUT_CHECK):
-    start_time = time.time()
     try:
         encoded_url = quote(unquote(url), safe=':/?&=')
+        start_time = time.time()  # 移到try内，检测开始才计时（修复非HTTP协议计时异常）
+        # 按协议分支检测
         if url.startswith("http"):
             req = urllib.request.Request(encoded_url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 if resp.status != 200:
-                    raise Exception("Status not 200")
+                    raise Exception(f"HTTP Status Error: {resp.status}")
         elif url.startswith("p3p"):
             if not check_p3p_url(encoded_url, timeout):
-                raise Exception("P3P check failed")
+                raise Exception("P3P Check Failed")
         elif url.startswith("p2p"):
             if not check_p2p_url(encoded_url, timeout):
-                raise Exception("P2P check failed")
+                raise Exception("P2P Check Failed")
         elif url.startswith(("rtmp", "rtsp")):
             if not check_rtmp_url(encoded_url, timeout):
-                raise Exception("RTMP/RTSP check failed")
+                raise Exception("RTMP/RTSP Check Failed")
         elif url.startswith("rtp"):
             if not check_rtp_url(encoded_url, timeout):
-                raise Exception("RTP check failed")
+                raise Exception("RTP Check Failed")
         else:
-            raise Exception("Unsupported scheme")
-        
-        elapsed = (time.time() - start_time) * 1000
-        return elapsed, True
+            raise Exception(f"Unsupported Scheme: {url.split('://')[0]}")
+        # 所有协议检测成功后，统一计算真实耗时
+        real_elapsed = (time.time() - start_time) * 1000
+        return real_elapsed, True
     except Exception:
         record_host(get_host_from_url(url))
         return None, False
@@ -208,6 +210,7 @@ def remove_duplicates_url(lines):
                 newlines.append(line)
     return newlines
 
+# 优化：白名单兜底值改为0.01ms，区分真实耗时和兜底
 def process_line(line, whitelist):
     if "#genre#" in line or "://" not in line or not line.strip():
         return None, None
@@ -217,10 +220,10 @@ def process_line(line, whitelist):
     name, url = parts
     url = url.strip()
     
-    # 白名单也检测真实响应时间，解决0.00ms问题
+    # 白名单检测真实响应时间，仅无耗时返回时兜底0.01ms（避免1.00ms假值 链接超时了）
     if url in whitelist:
         elapsed_time, _ = check_url(url)
-        return elapsed_time if elapsed_time else 1.0, line
+        return elapsed_time if elapsed_time is not None else 0.01, line
     
     elapsed_time, is_valid = check_url(url)
     return (elapsed_time, line) if is_valid else (None, line)
@@ -238,6 +241,7 @@ def process_urls_multithreaded(lines, whitelist, max_workers=MAX_WORKERS):
                     successlist.append(f"{elapsed:.2f}ms,{result}")
                 else:
                     blacklist.append(result)
+    # 按真实响应时间升序排序，兜底0.01ms的白名单链接会排在最前
     successlist.sort(key=lambda x: float(x.split(',')[0].replace('ms', '')))
     blacklist.sort()
     return successlist, blacklist
