@@ -1,36 +1,31 @@
 name: Live Platforms
 on:
   schedule:
-    - cron: '15 16/2 * * *'        # 每2小时触发（UTC）
-  workflow_dispatch:             # 手动触发
-
+    - cron: '15 16/2 * * *'
+  workflow_dispatch:
 jobs:
   merge-m3u:
     runs-on: ubuntu-latest
     env:
-      MERGED_M3U: "live_platforms.m3u" # 仅保留这个合并文件
-      TIMEOUT: 15 # 下载超时15秒
-      RETRY: 3    # 失败重试3次
+      MERGED_M3U: "live_platforms.m3u"
+      TIMEOUT: 15
+      RETRY: 3
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: 下载并合并所有M3U
         run: |
           set +e
-          # 待下载M3U源链接（恢复4个源：虎牙+斗鱼+B站+YY轮播）
           M3U_URLS=(
             "https://sub.ottiptv.cc/huyayqk.m3u"
             "https://sub.ottiptv.cc/douyuyqk.m3u"
             "https://sub.ottiptv.cc/bililive.m3u"
             "https://sub.ottiptv.cc/yylunbo.m3u"
           )
-
-          # 通用下载函数：加容错，屏蔽错误输出
           download() {
             local url=$1 out=$2 tmp=${out}.tmp attempt=1
-            rm -f $tmp 2>/dev/null # 屏蔽文件不存在错误
+            rm -f $tmp 2>/dev/null
             while [ $attempt -le $RETRY ]; do
               if wget -q --timeout=$TIMEOUT "$url" -O $tmp 2>/dev/null && [ -s $tmp ]; then
                 mv $tmp $out 2>/dev/null
@@ -41,26 +36,19 @@ jobs:
             done
             rm -f $tmp 2>/dev/null && echo "⚠️ 下载失败：$out，保留旧文件"
           }
-
           find . -maxdepth 1 -name "*.m3u" -delete 2>/dev/null
           echo "🗑️  前置清理完成：删除当前目录所有旧的M3U文件"
-
-          # 1. 下载所有M3U链接
           echo "📥 开始下载M3U源文件"
           for url in "${M3U_URLS[@]}"; do
             fn=$(basename "$url" | cut -d'?' -f1 | cut -d'&' -f1)
             download "$url" "$fn"
           done
-
-          # YY轮播相关逻辑
           if [ -s "yylunbo.m3u" ]; then
             sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
             echo "🔧 YY轮播域名替换完成：sub → yylunbo"
           fi
-
-          # 2. 合并所有M3U为单个文件
           echo "🔗 开始合并为 ${MERGED_M3U}"
-          echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null # 播放器标准头
+          echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null
           tmp=$(mktemp)
           touch "$tmp"
           for f in *.m3u; do 
@@ -70,32 +58,22 @@ jobs:
           done
           [ -s "$tmp" ] && awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' "$tmp" >> "${MERGED_M3U}" 2>/dev/null
           rm -f "$tmp" 2>/dev/null
-
-          # 3. 删除其他源M3U，仅保留合并后的文件
           find . -maxdepth 1 -name "*.m3u" ! -name "${MERGED_M3U}" -delete 2>/dev/null
           echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
-
-          # 4. Git配置+提交
+      - name: 配置Git并暂存文件
+        run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 核心优化：首次运行（文件不存在）强制提交，后续仅变更提交
-          if [ ! -f "${MERGED_M3U}" ]; then
-            git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
-            echo "✅ 首次运行，初始化合并文件并提交"
-          elif ! git diff --quiet -- "${MERGED_M3U}"; then
-            git add "${MERGED_M3U}"
-            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
-            echo "✅ 合并文件有更新，提交成功"
-          else
-            echo "ℹ️ 无M3U文件变更，跳过提交"
-            exit 0
-          fi
-
-      - name: 推送合并结果到仓库
+          git add "${{ env.MERGED_M3U }}" 2>/dev/null
+      - name: 提交并推送变更
         run: |
-          git pull --rebase origin main || true
-          git push origin main
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无直播平台M3U文件变更，跳过提交推送"
+          else
+            git pull --rebase origin main || true
+            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin main
+            echo "✅ 直播平台M3U合并完成并推送成功"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
