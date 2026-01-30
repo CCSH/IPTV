@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta, timezone
 import os
-from urllib.parse import urlparse
+from urllib.parse import quote, unquote, urlparse
 import socket  #check p3p源 rtp源
 import subprocess #check rtmp源
 
@@ -242,13 +242,20 @@ def convert_m3u_to_txt(m3u_content):
 
 url_statistics=[]
 
+def safe_quote_url(url):
+    # 第一步：解码（无论是否编码，解码后统一为原始未编码状态）
+    unquoted_url = unquote(url)
+    # 第二步：按你的规则编码
+    quoted_url = quote(unquoted_url, safe=':/')
+    return quoted_url
+
 def process_url(url):
     try:
         # 打开URL并读取内容
         headers = {
             'User-Agent': 'PostmanRuntime-ApipostRuntime/1.1.0',
         }
-        req = urllib.request.Request(url, headers=headers)
+        req = urllib.request.Request(safe_quote_url(url), headers=headers)
         with urllib.request.urlopen(req, timeout=10) as response:
             # 以二进制方式读取数据
             data = response.read()
