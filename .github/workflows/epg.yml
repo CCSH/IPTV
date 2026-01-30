@@ -61,7 +61,7 @@ jobs:
           git fetch origin main
           git checkout --theirs main -- e.xml e.xml.gz || true
           git rebase origin/main || true
-          git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S') (CST)"
+          git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
           git push origin main -f
           echo "✅ EPG文件更新完成并强制推送成功"
         fi
