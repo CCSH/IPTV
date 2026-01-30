@@ -24,20 +24,35 @@ LOGO_URL_TPL = "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo
 
 # ===================== 通用工具函数 =====================
 def get_project_dirs() -> dict:
-    """统一获取项目所有目录/文件路径，避免硬编码"""
-    # 脚本所在目录
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    # 项目根目录（脚本目录的上一级，适配你的目录结构）
-    root_dir = os.path.dirname(script_dir)
+    """【修复核心】统一获取项目所有目录/文件路径，适配GitHub Actions/本地环境"""
+    # 脚本所在绝对路径（关键：__file__ 是当前脚本的完整路径）
+    script_abspath = os.path.abspath(__file__)
+    # 脚本所在目录（assets/whitelist-blacklist/）：存放blacklist/whitelist相关文件
+    script_dir = os.path.dirname(script_abspath)
+    # assets目录（脚本目录的上一级）：存放corrections_name.txt、urls.txt
+    assets_dir = os.path.dirname(script_dir)
+    # 项目根目录（assets的上一级）：存放主频道/地方台目录、生成live.txt/m3u
+    root_dir = os.path.dirname(assets_dir)
+    
+    # 打印路径日志（便于Actions中排查，可后续删除）
+    print(f"[PATH-LOG] 脚本绝对路径: {script_abspath}")
+    print(f"[PATH-LOG] 脚本目录: {script_dir}")
+    print(f"[PATH-LOG] assets目录: {assets_dir}")
+    print(f"[PATH-LOG] 项目根目录: {root_dir}")
+    
     return {
-        "script": script_dir,       # 脚本目录（assets/whitelist-blacklist/）
-        "root": root_dir,           # 项目根目录（生成live.txt/m3u的目录）
+        "script": script_dir,       # 脚本目录：assets/whitelist-blacklist/
+        "assets": assets_dir,       # assets目录：assets/
+        "root": root_dir,           # 项目根目录：生成live.txt/m3u的目录
+        # blacklist/whitelist 和脚本同目录
         "blacklist_auto": os.path.join(script_dir, "blacklist_auto.txt"),
         "blacklist_manual": os.path.join(script_dir, "blacklist_manual.txt"),
         "whitelist_manual": os.path.join(script_dir, "whitelist_manual.txt"),
         "whitelist_auto": os.path.join(script_dir, "whitelist_auto.txt"),
-        "corrections_name": os.path.join(os.path.dirname(script_dir), "corrections_name.txt"),
-        "urls": os.path.join(os.path.dirname(script_dir), "assets/urls.txt"),
+        # corrections_name.txt、urls.txt 在assets目录下
+        "corrections_name": os.path.join(assets_dir, "corrections_name.txt"),
+        "urls": os.path.join(assets_dir, "urls.txt"),
+        # 主频道/地方台 在项目根目录下
         "main_channel": os.path.join(root_dir, "主频道"),  # 主频道字典目录
         "local_channel": os.path.join(root_dir, "地方台")   # 地方台字典目录
     }
@@ -437,7 +452,7 @@ if __name__ == "__main__":
     # 初始化时间
     timestart = datetime.now()
     print(f"[START] 程序开始执行: {timestart.strftime('%Y%m%d %H:%M:%S')}")
-    # 获取所有路径
+    # 获取所有路径（修复后的核心）
     dirs = get_project_dirs()
     # 1. 加载黑名单（自动+手动）
     blacklist = load_blacklist(dirs["blacklist_auto"], dirs["blacklist_manual"])
