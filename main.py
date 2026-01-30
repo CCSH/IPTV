@@ -22,6 +22,8 @@ RESPONSE_TIME_THRESHOLD = 2000
 # M3U相关配置
 TVG_URL = "https://github.com/CCSH/IPTV/raw/refs/heads/main/e.xml.gz"
 LOGO_URL_TPL = "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/logo/{}.png"
+# 所有单个频道最多保留的有效源数量，可直接修改数字（-1=无限制）
+SINGLE_CHANNEL_MAX_COUNT = 20  
 
 # ===================== 通用工具函数 =====================
 def get_project_dirs() -> dict:
@@ -192,6 +194,9 @@ class ChannelClassifier:
         self.other_lines = []
         self.other_urls = set()
         self.all_urls = {}
+        # === 全局单频道限流 新增：单频道计数字典 ===
+        self.single_chn_count = {}  # key: 频道名(如CCTV1), value: 已添加源数量
+        # 初始化分类数据
         for chn_type in list(main_dict.keys()) + list(local_dict.keys()):
             self.channel_data[chn_type] = []
             self.all_urls[chn_type] = set()
@@ -201,18 +206,38 @@ class ChannelClassifier:
             return True
         return False
 
+    # === 全局单频道限流 ===
+    def is_single_chn_limit(self, channel_name: str) -> bool:
+        if SINGLE_CHANNEL_MAX_COUNT == -1:
+            return False  # -1表示无限制
+        # 获取该频道已添加数量，默认0
+        current_count = self.single_chn_count.get(channel_name, 0)
+        # 达到上限返回True，否则False
+        if current_count >= SINGLE_CHANNEL_MAX_COUNT:
+            # 仅首次达到上限时打印日志，避免刷屏
+            if current_count == SINGLE_CHANNEL_MAX_COUNT:
+                print(f"[SINGLE_LIMIT] 频道「{channel_name}」已达最大源数量({SINGLE_CHANNEL_MAX_COUNT}个)，后续源不再添加")
+            return True
+        return False
+
     def add_channel_line(self, chn_type: str, line: str, url: str):
         self.channel_data[chn_type].append(line)
         self.all_urls[chn_type].add(url)
+        # === 全局单频道限流 新增：更新单频道计数 ===
+        channel_name = line.split(',')[0].strip()
+        self.single_chn_count[channel_name] = self.single_chn_count.get(channel_name, 0) + 1
 
     def add_other_line(self, line: str, url: str):
         if url not in self.other_urls and url not in self.blacklist:
             self.other_urls.add(url)
             self.other_lines.append(line)
 
+    # === 全局单频道限流 ===
     def classify(self, channel_name: str, channel_url: str, line: str):
-        if channel_url in self.blacklist or not channel_url:
+        # 先判断：黑名单/空URL → 跳过；单频道达上限 → 跳过
+        if channel_url in self.blacklist or not channel_url or self.is_single_chn_limit(channel_name):
             return
+        # 原有分类逻辑不变
         for chn_type, chn_names in self.main_dict.items():
             if channel_name in chn_names and not self.check_url_exist(chn_type, channel_url):
                 self.add_channel_line(chn_type, line, channel_url)
@@ -288,11 +313,13 @@ def process_single_line(line: str, classifier: ChannelClassifier, corrections: d
         channel_name, channel_address = line.split(',', 1)
     except ValueError:
         return
+    # 频道名标准化（简繁转换→清理→纠错）
     channel_name = traditional_to_simplified(channel_name)
     channel_name = clean_channel_name(channel_name)
     channel_name = correct_channel_name(channel_name, corrections)
     channel_address = clean_url(channel_address)
     new_line = f"{channel_name},{channel_address}"
+    # 传入标准化后的频道名做分类（保证计数统一）
     classifier.classify(channel_name, channel_address, new_line)
 
 def sort_channel_data(channel_data: list, chn_type: str, cfg_list: list) -> list:
@@ -318,6 +345,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict, lite_sort
     version = f"{formatted_time},https://gcalic.v.myalicdn.com/gc/wgw05_1/index.m3u8?contentid=2820180516001"
     header = ["更新时间,#genre#", version, '\n']
 
+    # 生成lite版
     lite_lines = header.copy()
     for chn_type in lite_sort:
         chn_data = classifier.get_channel_data(chn_type)
@@ -325,6 +353,7 @@ def generate_live_text(classifier: ChannelClassifier, main_dict: dict, lite_sort
         lite_lines += [f"{chn_type},#genre#"] + sorted_data + ['\n']
     lite_lines = lite_lines[:-1] if lite_lines and lite_lines[-1] == '\n' else lite_lines
 
+    # 生成full版
     full_lines = lite_lines.copy() + ['\n']
     full_other_types = [
         "儿童频道", "国际台", "纪录片", "戏曲频道", "上海频道", "湖南频道",
@@ -437,4 +466,5 @@ if __name__ == "__main__":
     print(f"[STAT] 黑名单URL数: {blacklist_count}")
     print(f"[STAT] live.txt行数: {live_count}")
     print(f"[STAT] others.txt行数: {others_count}")
+    print(f"[STAT] 全局单频道最大源数量限制: {SINGLE_CHANNEL_MAX_COUNT}个")
     print("=" * 60)
