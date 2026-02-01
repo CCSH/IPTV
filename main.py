@@ -213,9 +213,6 @@ class ChannelClassifier:
         current_count = self.single_chn_count.get(channel_name, 0)
         # 达到上限返回True，否则False
         if current_count >= SINGLE_CHANNEL_MAX_COUNT:
-            # 仅首次达到上限时打印日志，避免刷屏
-            if current_count == SINGLE_CHANNEL_MAX_COUNT:
-                print(f"[SINGLE_LIMIT] 频道「{channel_name}」已达最大源数量({SINGLE_CHANNEL_MAX_COUNT}个)，后续源不再添加")
             return True
         return False
 
@@ -465,5 +462,6 @@ if __name__ == "__main__":
     print(f"[STAT] live.txt行数: {live_count}")
     print(f"[STAT] others.txt行数: {others_count}")
     print("=" * 60)
+
 
 
