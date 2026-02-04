@@ -1,0 +1,68 @@
+name: EPG Update
+on:
+  schedule:
+    - cron: '30 16,20,0,4,8,12 * * *'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Update EPG Files
+        run: |
+          rm -rf e.xml e.xml.gz
+          EPG_SOURCES=(
+            "https://epg.112114.xyz/pp.xml"
+            "http://e.erw.cc/all.xml"
+            "https://epg.zsdc.eu.org/t.xml"
+            "http://epg.51zmt.top:8000/e1.xml"
+          )
+          DOWNLOAD_SUCCESS=0
+          for SOURCE in "${EPG_SOURCES[@]}"; do
+            echo "尝试下载EPG源: $SOURCE"
+            wget -v -T 20 -O e.xml "$SOURCE" -t 2 || true
+            if [ -f e.xml ] && [ -s e.xml ] && head -1 e.xml | grep -q "<?xml"; then
+              echo "✅ 成功下载有效EPG源: $SOURCE"
+              DOWNLOAD_SUCCESS=1
+              break # 删掉无意义的touch e.xml
+            else
+              echo "❌ EPG源 $SOURCE 下载失败/空文件/非XML，尝试下一个"
+              rm -f e.xml
+            fi
+          done
+          if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
+            echo "❌ 所有EPG源下载失败，任务终止"
+            exit 1
+          fi
+          echo "🔧 开始压缩e.xml到e.xml.gz"
+          gzip -9 -c e.xml > e.xml.gz
+          if [ ! -s e.xml.gz ]; then
+            echo "❌ 压缩文件生成失败"
+            exit 1
+          fi
+          
+      - name: 暂存文件
+        run: git add -f e.xml e.xml.gz
+        continue-on-error: true
+          
+      - name: 拉取最新代码并提交推送
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "EPG Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 拉取最新代码并强制推送完成"
+          else
+            echo "ℹ️ 无文件变更，跳过提交和推送"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

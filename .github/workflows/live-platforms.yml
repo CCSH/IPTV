@@ -1,0 +1,84 @@
+name: Live Platforms
+on:
+  schedule:
+    - cron: '15 16/2 * * *'
+  workflow_dispatch:
+jobs:
+  merge-m3u:
+    runs-on: ubuntu-22.04
+    env:
+      MERGED_M3U: "live_platforms.m3u"
+      TIMEOUT: 15
+      RETRY: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 下载并合并所有M3U
+        run: |
+          set +e
+          M3U_URLS=(
+            "https://sub.ottiptv.cc/huyayqk.m3u"
+            "https://sub.ottiptv.cc/douyuyqk.m3u"
+            "https://sub.ottiptv.cc/bililive.m3u"
+            "https://sub.ottiptv.cc/yylunbo.m3u"
+          )
+          download() {
+            local url=$1 out=$2 tmp=${out}.tmp attempt=1
+            rm -f $tmp 2>/dev/null
+            while [ $attempt -le $RETRY ]; do
+              if wget -q --timeout=$TIMEOUT "$url" -O $tmp 2>/dev/null && [ -s $tmp ]; then
+                mv $tmp $out 2>/dev/null
+                echo "✅ 下载成功：$out"
+                return 0
+              fi
+              sleep $attempt && attempt=$((attempt+1))
+            done
+            rm -f $tmp 2>/dev/null && echo "⚠️ 下载失败：$out，保留旧文件"
+          }
+          find . -maxdepth 1 -name "*.m3u" -delete 2>/dev/null
+          echo "🗑️  前置清理完成：删除当前目录所有旧的M3U文件"
+          echo "📥 开始下载M3U源文件"
+          for url in "${M3U_URLS[@]}"; do
+            fn=$(basename "$url" | cut -d'?' -f1 | cut -d'&' -f1)
+            download "$url" "$fn"
+          done
+          if [ -s "yylunbo.m3u" ]; then
+            sed -i 's#https://sub.ottiptv.cc#https://yylunbo.ottiptv.cc#g' yylunbo.m3u
+            echo "🔧 YY轮播域名替换完成：sub → yylunbo"
+          fi
+          echo "🔗 开始合并为 ${MERGED_M3U}"
+          echo "#EXTM3U" > "${MERGED_M3U}" 2>/dev/null
+          tmp=$(mktemp)
+          touch "$tmp"
+          for f in *.m3u; do 
+            if [ -s "$f" ]; then 
+              sed '1d' "$f" | grep -v '^$' >> "$tmp" 2>/dev/null
+            fi
+          done
+          [ -s "$tmp" ] && awk 'NR%2==1{line=$0;next} !seen[$0]++{print line"\n"$0}' "$tmp" >> "${MERGED_M3U}" 2>/dev/null
+          rm -f "$tmp" 2>/dev/null
+          find . -maxdepth 1 -name "*.m3u" ! -name "${MERGED_M3U}" -delete 2>/dev/null
+          echo "🗑️  已删除源M3U文件，仅保留 ${MERGED_M3U}"
+          
+      - name: 暂存文件
+        run: git add "${{ env.MERGED_M3U }}"
+        continue-on-error: true
+        
+      - name: 拉取最新代码并提交推送
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "Live Platforms: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 拉取最新代码并强制推送完成"
+          else
+            echo "ℹ️ 无文件变更，跳过提交和推送"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

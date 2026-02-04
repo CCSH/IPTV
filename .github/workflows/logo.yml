@@ -1,0 +1,70 @@
+name: Logo Update
+env:
+  TZ: Asia/Shanghai
+  LOGO_DIR: "logo"
+  FILE_EXT: "png"
+  MIN_FILE_SIZE: "1k"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+jobs:
+  sync-logo:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 初始化logo目录
+        run: mkdir -p "$LOGO_DIR" && chmod 755 "$LOGO_DIR"
+
+      - name: 同步Logo文件
+        run: |
+          set -euo pipefail
+          REPOS=(
+            "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
+            "https://github.com/fanmingming/live.git|tv|fanmingming-live"
+          )
+          for REPO in "${REPOS[@]}"; do
+            IFS='|' read -r URL DIR TAG <<< "$REPO"
+            TEMP_DIR="temp_$TAG"
+            echo "处理仓库：$TAG"
+            git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { echo "克隆失败，跳过"; continue; }
+            [ ! -d "$TEMP_DIR" ] && { echo "临时目录创建失败，跳过"; continue; }
+            cd "$TEMP_DIR" && git sparse-checkout set "$DIR" 2>/dev/null || { cd ..; rm -rf "$TEMP_DIR"; echo "目录不存在，跳过"; continue; }
+            cd ..
+            find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" -exec cp -f {} "$LOGO_DIR/" \;
+            rm -rf "$TEMP_DIR"
+          done
+          find "$LOGO_DIR" -type f -name "*.$FILE_EXT" ! -size +"$MIN_FILE_SIZE" -delete
+          for new_png in "$LOGO_DIR"/*.$FILE_EXT; do
+            [ -f "$new_png" ] && touch -r "$new_png" "$new_png" 2>/dev/null
+          done
+          
+      - name: 暂存文件
+        run: git add "$LOGO_DIR"/*.$FILE_EXT
+        continue-on-error: true
+        
+      - name: 拉取最新代码并提交推送
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "Logo Update: $(date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 拉取最新代码并强制推送完成"
+          else
+            echo "ℹ️ 无文件变更，跳过提交和推送"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 清理临时文件
+        if: always()
+        run: rm -rf temp_* .temp_* 2>/dev/null

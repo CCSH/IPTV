@@ -1,0 +1,46 @@
+# 工作流名称，可自定义
+name: Clean Commit
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: '要清空提交记录的分支（默认main）'
+        required: true
+        default: 'main'
+permissions:
+  contents: write
+
+# 执行的任务
+jobs:
+  clear-history:
+    # 使用GitHub托管运行器（ubuntu稳定版）
+    runs-on: ubuntu-22.04
+    steps:
+      # 步骤1：克隆仓库（浅克隆，仅拉取最新代码，提高速度）
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+          fetch-depth: 1 # 浅克隆，只取最新提交
+
+      # 步骤2：初始化新仓库、配置git用户
+      - name: Re-initialize git repository
+        run: |
+          # 移除原有.git目录
+          rm -rf .git
+          # 重新初始化git仓库
+          git init
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          # 将当前所有文件加入暂存区
+          git add .
+          # 提交新的初始版本（备注可自定义）
+          git commit -m "Clean Commit"
+          # 添加远端仓库地址（使用GITHUB_TOKEN免密推送，避免权限问题）
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      # 步骤3：强制推送到目标分支（核心步骤，覆盖原有历史）
+      - name: Force push to target branch
+        run: |
+          git push -f origin HEAD:${{ github.event.inputs.target_branch }}

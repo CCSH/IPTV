@@ -1,0 +1,54 @@
+name: 'WhiteList BlackList'
+on:
+  schedule:
+    - cron: '0 16 * * 4'
+  workflow_dispatch:
+
+jobs:
+  run-job:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 安装系统依赖
+        run: sudo apt-get update -y && sudo apt-get install -y --no-install-recommends ffmpeg && ffmpeg -version && ffprobe -version
+
+      - name: 运行脚本
+        run: |
+          chmod +x assets/whitelist-blacklist/main.py
+          python assets/whitelist-blacklist/main.py
+
+      - name: 暂存文件
+        run: git add --force assets/whitelist-blacklist/*.txt
+        continue-on-error: true
+          
+      - name: 拉取最新代码并提交推送
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "黑白名单 Update: $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 拉取最新代码并强制推送完成"
+          else
+            echo "ℹ️ 无文件变更，跳过提交和推送"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
