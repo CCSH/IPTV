@@ -3,8 +3,8 @@ CCTV1,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226016/index.m3u8
 CCTV2,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225588/index.m3u8
 CCTV3,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226021/index.m3u8
 CCTV4,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226428/index.m3u8
-CCTV4 欧洲,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226009/index.m3u8
-CCTV4 美洲,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226012/index.m3u8
+CCTV4欧洲,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226009/index.m3u8
+CCTV4美洲,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226012/index.m3u8
 CCTV5,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226019/index.m3u8
 CCTV5+,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225603/index.m3u8
 CCTV6,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226010/index.m3u8
@@ -22,15 +22,15 @@ CCTV17,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225765/index.m3u8
 CETV1,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225652/index.m3u8
 CETV2,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226425/index.m3u8
 CETV4,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225783/index.m3u8
-CGTN 英语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225604/index.m3u8
-CGTN 西语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226431/index.m3u8
-CGTN 俄语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226543/index.m3u8
-CGTN 法语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226520/index.m3u8
-CGTN 阿语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226517/index.m3u8
-CGTN 纪录,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225602/index.m3u8
-CCTV 音乐之声,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226502/index.m3u8
-CCTV 经典音乐,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226503/index.m3u8
-CCTV 央广新闻,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226504/index.m3u8
+CGTN英语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225604/index.m3u8
+CGTN西语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226431/index.m3u8
+CGTN俄语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226543/index.m3u8
+CGTN法语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226520/index.m3u8
+CGTN阿语,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226517/index.m3u8
+CGTN纪录,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225602/index.m3u8
+CCTV音乐之声,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226502/index.m3u8
+CCTV经典音乐,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226503/index.m3u8
+CCTV央广新闻,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226504/index.m3u8
 📡｜百视通卫视,#genre#
 北京卫视,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226450/index.m3u8
 北京卫视,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225728/index.m3u8
@@ -123,7 +123,7 @@ CCTV 央广新闻,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226504/
 鹤岗综合,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226534/index.m3u8
 漠河综合,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226535/index.m3u8
 大庆教育,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226523/index.m3u8
-🎬｜精品 / 特色频道,#genre#
+🎬｜精品/特色频道,#genre#
 黑莓电影,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225743/index.m3u8
 黑莓动画,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225662/index.m3u8
 纪实人文,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225738/index.m3u8
@@ -171,7 +171,7 @@ CCTV 央广新闻,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226504/
 书画频道,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226511/index.m3u8
 文物宝库,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226512/index.m3u8
 百姓健康,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226513/index.m3u8
-🎧｜央广 / 央视频道,#genre#
+🎧｜央广/央视频道,#genre#
 央广中国之声,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226521/index.m3u8
 央广经济之声,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226522/index.m3u8
 央广文艺之声,http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226524/index.m3u8
