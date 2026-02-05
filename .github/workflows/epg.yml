@@ -18,10 +18,9 @@ jobs:
         run: |
           rm -rf e.xml e.xml.gz
           EPG_SOURCES=(
-            "https://epg.112114.xyz/pp.xml"
+            "http://epg.51zmt.top:8000/e1.xml"
             "http://e.erw.cc/all.xml"
             "https://epg.zsdc.eu.org/t.xml"
-            "http://epg.51zmt.top:8000/e1.xml"
           )
           DOWNLOAD_SUCCESS=0
           for SOURCE in "${EPG_SOURCES[@]}"; do
