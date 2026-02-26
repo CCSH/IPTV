@@ -18,11 +18,9 @@ def get_file_paths():
     """获取文件路径"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
-    parent2_dir = os.path.dirname(parent_dir)
     
     return {
         "urls": os.path.join(parent_dir, 'urls.txt'),
-        "live": os.path.join(parent2_dir, 'live.txt'),
         "blacklist_auto": os.path.join(current_dir, 'blacklist_auto.txt'),
         "whitelist_manual": os.path.join(current_dir, 'whitelist_manual.txt'),
         "whitelist_auto": os.path.join(current_dir, 'whitelist_auto.txt'),
