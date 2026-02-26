@@ -20,15 +20,15 @@ jobs:
           # 清理旧文件
           rm -rf e.xml e.xml.gz temp_epg_*.xml merged_epg.xml
           
-          # # 定义EPG源（优先其他源，最后处理epg.pw的合并源）
-          # EPG_SOURCES=(
-          #   "http://epg.51zmt.top:8000/e1.xml"
-          #   "http://e.erw.cc/all.xml"
-          #   "https://epg.zsdc.eu.org/t.xml"
-          # )
+          # 定义EPG源（优先其他源，最后处理epg.pw的合并源）
+          EPG_SOURCES=(
+            "http://epg.51zmt.top:8000/e1.xml"
+            "http://e.erw.cc/all.xml"
+            "https://epg.zsdc.eu.org/t.xml"
+          )
           
-          # # 第一步：尝试下载普通单源EPG
-          # DOWNLOAD_SUCCESS=0
+          # 第一步：尝试下载普通单源EPG
+          DOWNLOAD_SUCCESS=0
           # for SOURCE in "${EPG_SOURCES[@]}"; do
           #   echo "📥 尝试下载EPG源: $SOURCE"
           #   wget -v -T 20 -O e.xml "$SOURCE" -t 2 || true
