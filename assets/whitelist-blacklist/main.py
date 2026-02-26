@@ -47,8 +47,8 @@ logger = logging.getLogger(__name__)
 # 配置参数
 class Config:
     # UA配置
-    USER_AGENT_URL = "PostmanRuntime-ApipostRuntime/1.1.0"
-    USER_AGENT = "VLC/3.0.18 LibVLC/3.0.18"
+    USER_AGENT_URL = "okhttp/3.14.9"
+    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 PotPlayer/1.7.21098"
     
     # 超时配置
     TIMEOUT_FETCH = 8           # 远程URL内容获取超时
