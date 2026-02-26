@@ -1,8 +1,9 @@
 name: EPG Update
 on:
   schedule:
-    - cron: '30 16,22,4,10 * * *'
-  workflow_dispatch:
+    - cron: '30 16,22,4,10 * * *'  # 北京时间 00:30、06:30、12:30、18:30 运行
+  workflow_dispatch:  # 手动触发
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -16,35 +17,102 @@ jobs:
           
       - name: Update EPG Files
         run: |
-          rm -rf e.xml e.xml.gz
-          EPG_SOURCES=(
-            "http://epg.51zmt.top:8000/e1.xml"
-            "http://e.erw.cc/all.xml"
-            "https://epg.zsdc.eu.org/t.xml"
-          )
-          DOWNLOAD_SUCCESS=0
-          for SOURCE in "${EPG_SOURCES[@]}"; do
-            echo "尝试下载EPG源: $SOURCE"
-            wget -v -T 20 -O e.xml "$SOURCE" -t 2 || true
-            if [ -f e.xml ] && [ -s e.xml ] && head -1 e.xml | grep -q "<?xml"; then
-              echo "✅ 成功下载有效EPG源: $SOURCE"
-              DOWNLOAD_SUCCESS=1
-              break # 删掉无意义的touch e.xml
-            else
-              echo "❌ EPG源 $SOURCE 下载失败/空文件/非XML，尝试下一个"
-              rm -f e.xml
-            fi
-          done
+          # 清理旧文件
+          rm -rf e.xml e.xml.gz temp_epg_*.xml merged_epg.xml
+          
+          # # 定义EPG源（优先其他源，最后处理epg.pw的合并源）
+          # EPG_SOURCES=(
+          #   "http://epg.51zmt.top:8000/e1.xml"
+          #   "http://e.erw.cc/all.xml"
+          #   "https://epg.zsdc.eu.org/t.xml"
+          # )
+          
+          # # 第一步：尝试下载普通单源EPG
+          # DOWNLOAD_SUCCESS=0
+          # for SOURCE in "${EPG_SOURCES[@]}"; do
+          #   echo "📥 尝试下载EPG源: $SOURCE"
+          #   wget -v -T 20 -O e.xml "$SOURCE" -t 2 || true
+          #   if [ -f e.xml ] && [ -s e.xml ] && head -1 e.xml | grep -q "<?xml"; then
+          #     echo "✅ 成功下载有效EPG源: $SOURCE"
+          #     DOWNLOAD_SUCCESS=1
+          #     break
+          #   else
+          #     echo "❌ EPG源 $SOURCE 下载失败/空文件/非XML，尝试下一个"
+          #     rm -f e.xml
+          #   fi
+          # done
+          
+          # 第二步：如果普通源失败，处理epg.pw的CN/HK/TW合并源
           if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
+            echo "ℹ️ 普通EPG源全部失败，尝试合并 epg.pw 的 CN/HK/TW 源"
+            
+            # 定义epg.pw的三个源
+            EPG_PW_SOURCES=(
+              "https://epg.pw/xmltv/epg_CN.xml"
+              "https://epg.pw/xmltv/epg_HK.xml"
+              "https://epg.pw/xmltv/epg_TW.xml"
+            )
+            
+            # 下载三个源并保存为临时文件
+            for INDEX in "${!EPG_PW_SOURCES[@]}"; do
+              SOURCE="${EPG_PW_SOURCES[$INDEX]}"
+              TEMP_FILE="temp_epg_$INDEX.xml"
+              echo "📥 下载 $SOURCE 到 $TEMP_FILE"
+              wget -v -T 20 -O "$TEMP_FILE" "$SOURCE" -t 2 || rm -f "$TEMP_FILE"
+            done
+            
+            # 检查是否有有效临时文件
+            VALID_TEMP_FILES=$(ls temp_epg_*.xml 2>/dev/null | wc -l)
+            if [ $VALID_TEMP_FILES -eq 0 ]; then
+              echo "❌ epg.pw 所有源下载失败，任务终止"
+              exit 1
+            fi
+            
+            # 合并三个XML文件（保留根标签，合并channel/programme）
+            echo "🔧 合并 epg.pw 的多个EPG文件"
+            # 提取第一个文件的头部
+            head -n -1 temp_epg_0.xml > merged_epg.xml
+            # 追加其他文件的内容（去掉头部和尾部）
+            for TEMP_FILE in temp_epg_*.xml; do
+              if [ "$TEMP_FILE" != "temp_epg_0.xml" ]; then
+                sed -e '1d' -e '$d' "$TEMP_FILE" >> merged_epg.xml
+              fi
+            done
+            # 追加根标签尾部
+            echo "</tv>" >> merged_epg.xml
+            
+            # 修正时区为 +0800（替换所有时区格式）
+            echo "🕒 修正所有时间的时区为 +0800"
+            sed -i 's/\(\d\{8\}T\d\{6\}\)[+-]\d\{4\}/\1+0800/g' merged_epg.xml
+            sed -i 's/\(\d\{8\}T\d\{6\}\)UTC/\1+0800/g' merged_epg.xml
+            sed -i 's/<timezone>UTC<\/timezone>/<timezone>+0800<\/timezone>/g' merged_epg.xml
+            
+            # 检查合并后的文件是否有效
+            if [ -s merged_epg.xml ] && head -1 merged_epg.xml | grep -q "<?xml"; then
+              mv merged_epg.xml e.xml
+              DOWNLOAD_SUCCESS=1
+              echo "✅ epg.pw 源合并并修正时区完成"
+            else
+              echo "❌ epg.pw 源合并失败，任务终止"
+              exit 1
+            fi
+          fi
+          
+          # 第三步：压缩文件
+          if [ $DOWNLOAD_SUCCESS -eq 1 ]; then
+            echo "🔧 开始压缩e.xml到e.xml.gz"
+            gzip -9 -c e.xml > e.xml.gz
+            if [ ! -s e.xml.gz ]; then
+              echo "❌ 压缩文件生成失败"
+              exit 1
+            fi
+          else
             echo "❌ 所有EPG源下载失败，任务终止"
             exit 1
           fi
-          echo "🔧 开始压缩e.xml到e.xml.gz"
-          gzip -9 -c e.xml > e.xml.gz
-          if [ ! -s e.xml.gz ]; then
-            echo "❌ 压缩文件生成失败"
-            exit 1
-          fi
+          
+          # 清理临时文件
+          rm -rf temp_epg_*.xml merged_epg.xml
           
       - name: 暂存文件
         run: git add -f e.xml e.xml.gz
