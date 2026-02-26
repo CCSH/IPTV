@@ -48,17 +48,17 @@ logger = logging.getLogger(__name__)
 class Config:
     # UA配置
     USER_AGENT_URL = "PostmanRuntime-ApipostRuntime/1.1.0"
-    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    USER_AGENT = "VLC/3.0.18 LibVLC/3.0.18"
     
     # 超时配置
     TIMEOUT_FETCH = 8           # 远程URL内容获取超时
     TIMEOUT_CHECK = 4           # 每个直播源检测超时
     TIMEOUT_CONNECT = 2         # 连接建立超时
     TIMEOUT_READ = 2            # 数据读取超时
-    IPV6_TIMEOUT_FACTOR = 1.0   # IPv6超时倍数（相对TIMEOUT_CHECK）
+    IPV6_TIMEOUT_FACTOR = 1.2   # IPv6超时倍数（相对TIMEOUT_CHECK）
     
     # 线程配置
-    MAX_WORKERS = 30
+    MAX_WORKERS = 8
     
     # 重试配置
     MAX_RETRIES = 0             # 重试次数（0表示不重试）
