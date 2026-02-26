@@ -1,0 +1,101 @@
+name: Logo Update
+env:
+  TZ: Asia/Shanghai
+  LOGO_DIR: "logo"
+  FILE_EXT: "png"
+  MIN_FILE_SIZE: "1k"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+jobs:
+  sync-logo:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 初始化logo目录
+        run: mkdir -p "$LOGO_DIR" && chmod 755 "$LOGO_DIR"
+
+      - name: 同步Logo文件
+        run: |
+          set -euo pipefail
+          # 配置格式：仓库URL|源目录列表(逗号分隔)|标签
+          # 对zzzz仓库，源目录列表为 img,logo
+          REPOS=(
+            "https://github.com/sparkssssssssss/epg.git|logo|spark-epg"
+            "https://github.com/zzzz0317/beijing-unicom-iptv-playlist.git|img|zzzz-beijing"
+            "https://github.com/fanmingming/live.git|tv|fanmingming-live"
+          )
+          for REPO in "${REPOS[@]}"; do
+            IFS='|' read -r URL SRC_DIRS TAG <<< "$REPO"
+            TEMP_DIR="temp_$TAG"
+            # 创建对应子文件夹
+            TARGET_SUB_DIR="$LOGO_DIR/$TAG"
+            mkdir -p "$TARGET_SUB_DIR" && chmod 755 "$TARGET_SUB_DIR"
+            
+            echo "处理仓库：$TAG（目标目录：$TARGET_SUB_DIR）"
+            # 克隆仓库（只克隆一次，避免重复操作）
+            git clone --depth 1 --sparse --filter=blob:none "$URL" "$TEMP_DIR" 2>/dev/null || { 
+              echo "克隆仓库 $TAG 失败，跳过"; 
+              continue; 
+            }
+            [ ! -d "$TEMP_DIR" ] && { 
+              echo "$TAG 临时目录创建失败，跳过"; 
+              continue; 
+            }
+            
+            # 拆分源目录列表，循环处理每个目录
+            IFS=',' read -ra DIR_LIST <<< "$SRC_DIRS"
+            for DIR in "${DIR_LIST[@]}"; do
+              echo "  处理子目录：$DIR"
+              cd "$TEMP_DIR" && git sparse-checkout set "$DIR" 2>/dev/null || { 
+                cd ..; 
+                echo "    目录 $DIR 不存在，跳过"; 
+                continue; 
+              }
+              cd ..
+              
+              # 复制该目录下符合条件的文件到目标子文件夹
+              find "$TEMP_DIR/$DIR" -name "*.$FILE_EXT" -type f -size +"$MIN_FILE_SIZE" -exec cp -f {} "$TARGET_SUB_DIR/" \;
+            done
+            
+            # 清理临时仓库
+            rm -rf "$TEMP_DIR"
+            
+            # 清理目标文件夹内的小文件
+            find "$TARGET_SUB_DIR" -type f -name "*.$FILE_EXT" ! -size +"$MIN_FILE_SIZE" -delete
+            # 更新文件时间戳
+            for new_png in "$TARGET_SUB_DIR"/*.$FILE_EXT; do
+              [ -f "$new_png" ] && touch -r "$new_png" "$new_png" 2>/dev/null
+            done
+          done
+          
+      - name: 暂存文件
+        run: git add "$LOGO_DIR"/*.$FILE_EXT
+        continue-on-error: true
+        
+      - name: 拉取最新代码并提交推送
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --name-only | grep -q .; then
+            git fetch origin main
+            git commit -m "Logo Update: $(date +'%Y-%m-%d %H:%M') (CST)"
+            git push origin HEAD:$GITHUB_REF_NAME --force
+            echo "✅ 拉取最新代码并强制推送完成"
+          else
+            echo "ℹ️ 无文件变更，跳过提交和推送"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 清理临时文件
+        if: always()
+        run: rm -rf temp_* .temp_* 2>/dev/null
