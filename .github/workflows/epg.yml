@@ -49,8 +49,8 @@ jobs:
             # 下载多个源
             EPG_PW_SOURCES=(
               "https://epg.pw/xmltv/epg_CN.xml"
-              # "https://epg.pw/xmltv/epg_HK.xml"
-              # "https://epg.pw/xmltv/epg_TW.xml"
+              "https://epg.pw/xmltv/epg_HK.xml"
+              "https://epg.pw/xmltv/epg_TW.xml"
             )
             for INDEX in "${!EPG_PW_SOURCES[@]}"; do
               wget -v -T 20 -O "temp_epg_$INDEX.xml" "${EPG_PW_SOURCES[$INDEX]}" -t 2 || rm -f "temp_epg_$INDEX.xml"
