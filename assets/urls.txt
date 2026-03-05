@@ -34,6 +34,7 @@ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国
 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewTV.SiTV.CIBN.m3u
 https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt
 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt
+https://iptv.catvod.com/tv.m3u
 https://xn--6orr3pi6g9uu.top/zb/zb.txt
 https://tv.iill.top/m3u/Gather
 https://m.iill.top/Live.m3u
