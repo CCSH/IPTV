@@ -17117,4 +17117,4 @@ hy-游戏-张颜齐,http://kkk.888.3116598.xyz/api.php?n=tttt&id=6XlTpQ&tk=FgM0v
 hy-游戏-赵瑾尧,http://kkk.888.3116598.xyz/api.php?n=tttt&id=YtyNfV&tk=FgM0vQMejxvG
 hy-游戏-赵磊,http://kkk.888.3116598.xyz/api.php?n=tttt&id=NtGGwA&tk=FgM0vQMejxvG
 ,http://kkk.888.3116598.xyz/api.php?n=tttt&id=&tk=FgM0vQMejxvG
-
+Alabbassia TV,https://stream.alabbassia.com/live/alabbassia/index.m3u8
