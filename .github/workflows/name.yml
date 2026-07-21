@@ -14,6 +14,7 @@ jobs:
       URLS: |
         http://epg.51zmt.top:8000/e1.xml.gz
         http://epg.51zmt.top:8000/e2.xml.gz
+        https://gitee.com/gsls200808/xmltvepg/raw/master/e9.xml.gz
         https://epg.zsdc.eu.org/t.xml
         https://raw.githubusercontent.com/kuke31/xmlgz/main/e.xml.gz
         https://raw.githubusercontent.com/suzukua/epg/refs/heads/hidden/t.xml.gz
