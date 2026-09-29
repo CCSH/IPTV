@@ -9,6 +9,7 @@
 - 白名单失败显示0.00ms，不加入黑名单
 - 新的失败链接追加到blacklist_auto
 - 支持手动输入多个URL，空格/换行/逗号分隔
+- 黑名单写入模式：BLACKLIST_MERGE = True 合并 / False 复写
 """
 
 import urllib.request
@@ -53,13 +54,18 @@ logger = logging.getLogger(__name__)
 class Config:
     USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     USER_AGENT_URL = "okhttp/3.14.9"
-    
+
     TIMEOUT_FETCH = 5
     TIMEOUT_CHECK = 2.5
     TIMEOUT_CONNECT = 1.5
     TIMEOUT_READ = 1.5
-    
+
     MAX_WORKERS = 30
+
+    # 黑名单写入模式（bool）：
+    #   True  = 合并（保留旧黑名单 + 追加新失败）
+    #   False = 复写（只保留本次检测失败的链接）
+    BLACKLIST_MERGE = False
 
 class StreamChecker:
     def __init__(self, manual_urls=None):
@@ -103,9 +109,16 @@ class StreamChecker:
         return blacklist
 
     def _save_blacklist(self):
+        # 复写模式：无论本次是否有新失败，都重写黑名单文件
+        if not Config.BLACKLIST_MERGE:
+            self._write_blacklist_file(self.new_failed_urls)
+            logger.info(f"黑名单已复写: {len(self.new_failed_urls)} 个")
+            return
+
+        # 合并模式：没有新失败就不动文件
         if not self.new_failed_urls:
             return
-        
+
         try:
             existing_lines = []
             has_header = False
@@ -115,13 +128,13 @@ class StreamChecker:
                     for line in existing_lines[:3]:
                         if line.startswith('更新时间') or line.startswith('blacklist'):
                             has_header = True
-            
+
             all_content = []
             if not has_header:
                 bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
                 version = f"{bj_time.strftime('%Y%m%d %H:%M')},url"
                 all_content.extend(["更新时间,#genre#", version, "", "blacklist,#genre#"])
-            
+
             existing_urls = set()
             for line in existing_lines:
                 if line and not line.startswith('更新时间') and not line.startswith('blacklist') and line.strip():
@@ -129,19 +142,29 @@ class StreamChecker:
                     if url and '://' in url and url not in existing_urls:
                         existing_urls.add(url)
                         all_content.append(line)
-            
+
             for url in self.new_failed_urls:
                 if url not in existing_urls:
                     existing_urls.add(url)
                     all_content.append(url)
-            
+
             os.makedirs(os.path.dirname(FILE_PATHS["blacklist_auto"]), exist_ok=True)
             with open(FILE_PATHS["blacklist_auto"], 'w', encoding='utf-8') as f:
                 f.write('\n'.join(all_content))
-            
+
             logger.info(f"黑名单已更新: 新增 {len(self.new_failed_urls)} 个")
         except Exception as e:
             logger.error(f"保存黑名单失败: {e}")
+
+    def _write_blacklist_file(self, urls: Set[str]):
+        """按标准格式重写黑名单文件（复写模式使用）"""
+        bj_time = datetime.now(timezone.utc) + timedelta(hours=8)
+        version = f"{bj_time.strftime('%Y%m%d %H:%M')},url"
+        all_content = ["更新时间,#genre#", version, "", "blacklist,#genre#"]
+        all_content.extend(sorted(urls))
+        os.makedirs(os.path.dirname(FILE_PATHS["blacklist_auto"]), exist_ok=True)
+        with open(FILE_PATHS["blacklist_auto"], 'w', encoding='utf-8') as f:
+            f.write('\n'.join(all_content))
 
     def read_file(self, file_path):
         try:
@@ -203,7 +226,7 @@ class StreamChecker:
     def check_url(self, url, is_whitelist=False):
         try:
             u = quote(unquote(url), safe=':/?&=#')
-            t = Config.TIMEOUT_CHECK *1.5 if is_whitelist else Config.TIMEOUT_CHECK
+            t = Config.TIMEOUT_CHECK * 1.5 if is_whitelist else Config.TIMEOUT_CHECK
             if url.startswith(('http://','https://')):
                 return self.check_http(u,t)
             elif url.startswith(('rtmp://','rtsp://')):
@@ -269,7 +292,7 @@ class StreamChecker:
             url2line[u] = full
             if u in self.blacklist_urls and u not in self.whitelist_urls:
                 pre_fail.append(full)
-                skip +=1
+                skip += 1
             else:
                 to_check.append((u, full))
         logger.info(f"黑名单跳过: {skip} | 待检测: {len(to_check)}")
@@ -284,10 +307,10 @@ class StreamChecker:
             for u,l in to_check:
                 wl = u in self.whitelist_urls
                 fut[e.submit(self.check_url,u,wl)] = (u,l,wl)
-            cnt =0
+            cnt = 0
             for f in as_completed(fut):
                 u,l,wl = fut[f]
-                cnt +=1
+                cnt += 1
                 try:
                     valid, t = f.result()
                     if valid:
@@ -299,9 +322,12 @@ class StreamChecker:
                             bad.append(l)
                             self.new_failed_urls.add(u)
                 except:
-                    if wl: ok.append((l,0.00))
-                    else: bad.append(l); self.new_failed_urls.add(u)
-                if cnt%50==0:
+                    if wl:
+                        ok.append((l,0.00))
+                    else:
+                        bad.append(l)
+                        self.new_failed_urls.add(u)
+                if cnt % 50 == 0:
                     v = sum(1 for _,x in ok if x>0)
                     logger.info(f"进度 {cnt}/{total} | 有效 {v} | 失败 {len(bad)}")
         ok.sort(key=lambda x:x[1])
@@ -356,9 +382,42 @@ def parse_input_urls(text):
     text = text.replace('\n',' ').replace(',',' ').strip()
     return [u.strip() for u in text.split() if u.strip() and '://' in u]
 
+# ================= 命令行参数解析 =================
+def parse_args(argv):
+    """
+    --merge / -m        合并（默认）
+    --overwrite / -o    复写
+    --no-merge          复写
+    也支持环境变量 BLACKLIST_MERGE=0/1/true/false
+    """
+    manual_urls = []
+    merge = Config.BLACKLIST_MERGE
+
+    env = os.environ.get("BLACKLIST_MERGE", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        merge = False
+    elif env in ("1", "true", "yes", "on"):
+        merge = True
+
+    i = 1
+    while i < len(argv):
+        arg = argv[i]
+        if arg in ("--merge", "-m"):
+            merge = True
+        elif arg in ("--overwrite", "-o", "--no-merge"):
+            merge = False
+        elif arg.startswith("--"):
+            pass  # 忽略未知参数
+        else:
+            manual_urls.extend(parse_input_urls(arg))
+        i += 1
+
+    Config.BLACKLIST_MERGE = merge
+    return manual_urls
+
 if __name__ == "__main__":
-    input_text = sys.argv[1] if len(sys.argv) >1 else ""
-    manual_urls = parse_input_urls(input_text)
+    manual_urls = parse_args(sys.argv)
+    logger.info(f"黑名单模式：{'合并' if Config.BLACKLIST_MERGE else '复写'}")
     checker = StreamChecker(manual_urls=manual_urls)
     try:
         checker.run()
