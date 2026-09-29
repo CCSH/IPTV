@@ -88,6 +88,11 @@ class StreamChecker:
             return False
 
     def _load_blacklist(self) -> Set[str]:
+        # 复写模式：不加载旧黑名单
+        if not Config.BLACKLIST_MERGE:
+            logger.info("复写模式：跳过加载旧黑名单")
+            return set()
+
         blacklist = set()
         try:
             if os.path.exists(FILE_PATHS["blacklist_auto"]):
