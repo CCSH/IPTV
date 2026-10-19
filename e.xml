@@ -333,6 +333,9 @@
   <channel id="933">
     <display-name lang="zh">云南都市</display-name>
   </channel>
+  <channel id="934">
+    <display-name lang="zh">云南影视</display-name>
+  </channel>
   <channel id="1025">
     <display-name lang="zh">安徽经济生活</display-name>
   </channel>
@@ -8467,6 +8470,98 @@
     <programme start="20261019235900 +0800" stop="20261020001300 +0800" channel="1967">
       <title>结束</title>
       <desc>此阶段没有电视节目播放。</desc>
+    </programme>
+    <programme start="20261019001800 +0800" stop="20261019002700 +0800" channel="934">
+      <title>影视气象站</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019002700 +0800" stop="20261019013000 +0800" channel="934">
+      <title>电影故事会</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019013000 +0800" stop="20261019031000 +0800" channel="934">
+      <title>好剧跟我看</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019031000 +0800" stop="20261019032500 +0800" channel="934">
+      <title>跟我看电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019032500 +0800" stop="20261019064800 +0800" channel="934">
+      <title>晚间节目结束</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019064800 +0800" stop="20261019070600 +0800" channel="934">
+      <title>跟我看电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019070600 +0800" stop="20261019085600 +0800" channel="934">
+      <title>好剧跟我看</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019085600 +0800" stop="20261019102200 +0800" channel="934">
+      <title>电影故事会</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019102200 +0800" stop="20261019111400 +0800" channel="934">
+      <title>天下电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019111400 +0800" stop="20261019113100 +0800" channel="934">
+      <title>购物时段</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019113100 +0800" stop="20261019125500 +0800" channel="934">
+      <title>天下电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019125500 +0800" stop="20261019131800 +0800" channel="934">
+      <title>跟我看电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019131800 +0800" stop="20261019151700 +0800" channel="934">
+      <title>五星电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019151700 +0800" stop="20261019153800 +0800" channel="934">
+      <title>购物时段</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019153800 +0800" stop="20261019164500 +0800" channel="934">
+      <title>电影故事会</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019164500 +0800" stop="20261019165500 +0800" channel="934">
+      <title>晚间节目开播</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019165500 +0800" stop="20261019184600 +0800" channel="934">
+      <title>五星电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019184600 +0800" stop="20261019190900 +0800" channel="934">
+      <title>跟我看电影</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019190900 +0800" stop="20261019205600 +0800" channel="934">
+      <title>好剧跟我看</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019205600 +0800" stop="20261019211200 +0800" channel="934">
+      <title>调剂节目</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019211200 +0800" stop="20261019220700 +0800" channel="934">
+      <title>电影故事会</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019220700 +0800" stop="20261019221800 +0800" channel="934">
+      <title>车影视界</title>
+      <desc>暂无节目描述</desc>
+    </programme>
+    <programme start="20261019221800 +0800" stop="20261019235959 +0800" channel="934">
+      <title>天下电影</title>
+      <desc>暂无节目描述</desc>
     </programme>
     <programme start="20261019084500 +0800" stop="20261019092900 +0800" channel="933">
       <title>第一剧场</title>
