@@ -1,4 +1,5 @@
 https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/assets/test.txt
+https://raw.githubusercontent.com/fafa002/yf2025/refs/heads/main/yiyifafa.txt
 https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt
 https://raw.githubusercontent.com/Jsnzkpg/Jsnzkpg/Jsnzkpg/Jsnzkpg1.m3u
 https://raw.githubusercontent.com/Supprise0901/TVBox_live/refs/heads/main/live.txt
@@ -46,6 +47,12 @@ https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/国
 https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/轮播_华数.黑莓.NewTV.SiTV.CIBN.m3u
 https://raw.githubusercontent.com/develop202/migu_video/refs/heads/main/interface.txt
 https://raw.githubusercontent.com/yuanzl77/IPTV/refs/heads/main/live.txt
+https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u
+http://38.75.136.137:88/api/tvlist.php
+http://www.52top.com.cn:678/downloads/migu.txt
+https://gitee.com/yuan301/tv/raw/master/A/z_v.png
+https://gitee.com/main-stream/tv/raw/master/BOSS.json
+https://live.hacks.tools/tv/iptv4.txt
 https://2121.ccwu.cc
 https://jsnzkpg.us.ci/live.m3u
 https://sports.de5.net/xiaohongshu/xhsworldcup.m3u
